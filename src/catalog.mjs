@@ -1447,6 +1447,42 @@ export const PROVIDERS = Object.freeze([
     free: 'Connects to an llm-d LLMInferenceService /v1 endpoint; a bearer token is required when cluster authentication is enabled.',
     models: ['RedHatAI/Qwen3-8B-FP8-dynamic'],
   },
+  {
+    id: 'tencent-tokenhub', name: 'Tencent Cloud TokenHub', badge: 'GLOBAL ROUTER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://tokenhub-intl.tencentcloudmaas.com/v1', env: 'TENCENT_TOKENHUB_API_KEY',
+    signup: 'https://intl.cloud.tencent.com/document/product/1300/80632',
+    free: 'International TokenHub access and pricing depend on the Tencent Cloud account and selected model.',
+    models: ['hy3', 'deepseek-v4-flash-202605', 'deepseek-v4-pro-202606', 'deepseek-v4-flash', 'deepseek-v4-pro'],
+  },
+  {
+    id: 'tencent-lkeap', name: 'Tencent Cloud LKEAP', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.lkeap.cloud.tencent.com/v1', env: 'TENCENT_LKEAP_API_KEY',
+    signup: 'https://cloud.tencent.com/document/product/1772/115969',
+    free: 'Uses a separate LKEAP API key and Tencent Cloud billing; DeepSeek workloads are migrating to TokenHub.',
+    models: ['deepseek-r1-0528', 'deepseek-v3-0324', 'deepseek-v3.1-terminus', 'deepseek-v3.2'],
+  },
+  {
+    id: 'tencent-edgeone', name: 'Tencent EdgeOne Inference', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'TENCENT_EDGEONE_URL', requiresBaseUrl: true, env: 'TENCENT_EDGEONE_API_TOKEN',
+    signup: 'https://intl.cloud.tencent.com/document/product/1145/78861',
+    free: 'Provide the public EdgeOne inference service URL ending in /v1; deployed compute and traffic charges apply.',
+    models: ['LLM-Research/Llama-3.2-3B-Instruct'],
+  },
+  {
+    id: 'tencent-tione', name: 'Tencent Cloud TI-ONE', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: true,
+    baseUrl: '', baseEnv: 'TENCENT_TIONE_URL', requiresBaseUrl: true,
+    env: 'TENCENT_TIONE_API_TOKEN', optionalKey: true,
+    signup: 'https://cloud.tencent.com/document/product/851/113484',
+    free: 'Connects to the /v1 URL of a user-deployed Angel-vLLM service; TI-ONE infrastructure charges apply.',
+    models: ['model-name'],
+  },
+  {
+    id: 'tencent-ai-gateway', name: 'Tencent Cloud AI Gateway', badge: 'GATEWAY', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'TENCENT_AI_GATEWAY_URL', requiresBaseUrl: true, env: 'TENCENT_AI_GATEWAY_API_KEY',
+    signup: 'https://cloud.tencent.com/document/product/1826/134818',
+    free: 'Provide the configured gateway base URL ending in /v1; gateway and upstream model billing apply.',
+    models: ['gpt-4o-mini'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
