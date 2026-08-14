@@ -1636,6 +1636,31 @@ export const PROVIDERS = Object.freeze([
     free: 'Runs large models locally with CPU/GPU hybrid offloading and no per-token service fee.',
     models: ['DeepSeek-Coder-V2-Instruct', 'Qwen/Qwen3-Coder-30B-A3B-Instruct'],
   },
+  {
+    id: 'martian', name: 'Martian Gateway', badge: 'SMART ROUTER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.withmartian.com/v1', env: 'MARTIAN_API_KEY',
+    signup: 'https://app.withmartian.com',
+    free: 'Unified access to 200+ models with Martian routing, caching, and usage tracking; model charges apply.',
+    models: [
+      'openai/gpt-5.2-pro', 'openai/gpt-5.2',
+      'anthropic/claude-opus-4-5', 'anthropic/claude-sonnet-4-5',
+      'google/gemini-2.5-flash',
+    ],
+  },
+  {
+    id: 'unify', name: 'Unify Universal API', badge: 'SMART ROUTER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.unify.ai/v0', env: 'UNIFY_API_KEY',
+    signup: 'https://console.unify.ai',
+    free: 'Endpoint selection and fallback routing are usage-priced; custom upstream keys can be configured in Unify.',
+    models: ['claude-3-opus@anthropic', 'gemini-1.5-pro@vertex-ai', 'gpt-4o@openai'],
+  },
+  {
+    id: 'notdiamond', name: 'Not Diamond Model Gateway', badge: 'AUTO ROUTER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://proxy.notdiamond.ai/v1/proxy', env: 'NOTDIAMOND_API_KEY',
+    signup: 'https://app.notdiamond.ai',
+    free: 'Routes through provider keys stored in Not Diamond; upstream model charges and plan limits apply.',
+    models: ['openai/gpt-4o', 'anthropic/claude-3-5-sonnet'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
