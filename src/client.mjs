@@ -40,7 +40,23 @@ export function isConfigured(provider, config, env = process.env) {
   return hasEndpoint && (provider.keyless || Boolean(providerKey(provider, config, env)));
 }
 
+export function modelIdsFromResponse(provider, body) {
+  if (provider.discover === false) return [...provider.models];
+  let items = body.data || body.models || [];
+  if (provider.modelPolicy === 'free-suffix') {
+    items = items.filter(item => {
+      const id = typeof item === 'string' ? item : item.id || item.name || '';
+      return id.includes(':free') || id.endsWith('-free') || id === 'openrouter/free';
+    });
+  }
+  if (provider.modelPolicy === 'included-tier') {
+    items = items.filter(item => typeof item === 'object' && item.usage_based_only === false);
+  }
+  return items.map(item => typeof item === 'string' ? item : item.id || item.name).filter(Boolean);
+}
+
 export async function discoverModels(provider, config, { env = process.env, timeout = 5_000 } = {}) {
+  if (provider.discover === false) return [...provider.models];
   const key = providerKey(provider, config, env);
   if (!provider.keyless && !key) return [];
   if (!providerBaseUrl(provider, config, env)) return [];
@@ -49,7 +65,7 @@ export async function discoverModels(provider, config, { env = process.env, time
   const response = await fetch(url, { headers: headersFor(provider, key), signal: timeoutSignal(timeout) });
   const body = await jsonOrError(response);
   if (provider.id === 'ollama') return (body.models || []).map(item => item.model || item.name).filter(Boolean);
-  return (body.data || body.models || []).map(item => typeof item === 'string' ? item : item.id || item.name).filter(Boolean);
+  return modelIdsFromResponse(provider, body);
 }
 
 export async function availableModels(config, options = {}) {

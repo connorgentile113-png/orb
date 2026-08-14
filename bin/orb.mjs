@@ -36,13 +36,21 @@ async function readyCatalog(config, refresh = false) {
 
 async function chooseModel(config) {
   const catalog = await readyCatalog(config, true);
-  const values = PROVIDERS.flatMap(provider => (catalog.get(provider.id) || []).map(model => ({
-    value: routeName(provider.id, model),
-    label: model,
-    hint: `${provider.name} · ${provider.badge}`,
+  const ready = PROVIDERS.map(provider => ({ provider, models: catalog.get(provider.id) || [] }))
+    .filter(entry => entry.models.length);
+  if (!ready.length) throw new Error('No ready models found. Start Ollama or add a cloud key with `orb key set <provider>`.');
+  const providerId = ready.length === 1 ? ready[0].provider.id : await choose('Choose a provider', ready.map(({ provider, models }) => ({
+    value: provider.id,
+    label: provider.name,
+    hint: `${provider.badge} · ${models.length} model${models.length === 1 ? '' : 's'}`,
   })));
-  if (!values.length) throw new Error('No ready models found. Start Ollama or add a cloud key with `orb key set <provider>`.');
-  return choose('Choose a model', values);
+  const entry = ready.find(item => item.provider.id === providerId);
+  const model = entry.models.length === 1 ? entry.models[0] : await choose(`${entry.provider.name} models`, entry.models.map(value => ({
+    value,
+    label: value,
+    hint: routeName(providerId, value) === config.selected ? 'selected' : '',
+  })));
+  return routeName(providerId, model);
 }
 
 async function useCommand(args, config) {
@@ -112,7 +120,7 @@ function endpointCommand(args, config) {
 async function keyCommand(args, config) {
   const action = args[0] || 'list';
   if (action === 'list') {
-    const rows = PROVIDERS.filter(provider => !provider.keyless).map(provider => [
+    const rows = PROVIDERS.filter(provider => !provider.keyless || provider.optionalKey).map(provider => [
       provider.id, provider.env, providerKey(provider, config) ? 'configured' : 'missing',
     ]);
     return table(rows, [{ label: 'PROVIDER' }, { label: 'ENVIRONMENT VARIABLE' }, { label: 'STATUS' }]);
@@ -120,7 +128,7 @@ async function keyCommand(args, config) {
   const id = args[1];
   const provider = PROVIDER_BY_ID.get(id);
   if (!provider) throw new Error(`Unknown provider: ${id || '(missing)'}`);
-  if (provider.keyless && action === 'set') throw new Error(`${provider.name} does not require a key.`);
+  if (provider.keyless && !provider.optionalKey && action === 'set') throw new Error(`${provider.name} does not require a key.`);
   if (action === 'set') {
     const value = await secretPrompt(`${provider.name} API key`);
     if (!value) throw new Error('Key was empty; nothing changed.');
@@ -207,7 +215,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.1.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.2.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());

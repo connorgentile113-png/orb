@@ -16,6 +16,9 @@ bypassing a provider’s limits.
   — compatibility and model cross-check.
 - [pollinations/pollinations](https://github.com/pollinations/pollinations) —
   provider-owned API implementation and documentation.
+- [open-free-llm-api/awesome-freellm-apis](https://github.com/open-free-llm-api/awesome-freellm-apis)
+  — machine-updated endpoint and model cross-check used for the second provider
+  round.
 
 ## Added to orb
 
@@ -40,6 +43,18 @@ bypassing a provider’s limits.
 | OpenRouter | `openrouter` | models ending in `:free` | `https://openrouter.ai/api/v1` |
 | NVIDIA NIM | `nvidia` | evaluation allowance | `https://integrate.api.nvidia.com/v1` |
 | Chutes | `chutes` | community tier | `https://llm.chutes.ai/v1` |
+| ModelScope | `modelscope` | daily free request allowance | `https://api-inference.modelscope.cn/v1` |
+| LLM7 | `llm7` | keyless quota; optional free token | `https://api.llm7.io/v1` |
+| OVHcloud AI Endpoints | `ovh` | anonymous rate-limited access | `https://oai.endpoints.kepler.ai.cloud.ovh.net/v1` |
+| Kilo Gateway | `kilo` | keyless `:free` routes | `https://api.kilo.ai/api/gateway` |
+| OpenCode Free Gateway | `opencode` | documented no-key chat models | `https://console.opencode.ai/inference/openai/v1` |
+| Aion Labs | `aion` | rate-limited free account | `https://api.aionlabs.ai/v1` |
+| Agnes AI | `agnes` | rate-limited free account | `https://apihub.agnes-ai.com/v1` |
+| GLHF.chat | `glhf` | community-hosted free models | `https://glhf.chat/api/openai/v1` |
+| AI21 Labs | `ai21` | limited developer tier | `https://api.ai21.com/studio/v1` |
+| Nscale | `nscale` | fair-use inference | `https://inference.api.nscale.com/v1` |
+| Nebius AI Studio | `nebius` | account credits | `https://api.studio.nebius.com/v1` |
+| xAI | `xai` | eligibility-dependent credits | `https://api.x.ai/v1` |
 
 GitHub Models remains in the catalog for compatibility but is marked `FREE
 RETIRED`: the reviewed catalog records retirement of its free tier on
@@ -57,6 +72,9 @@ access requires payment verification.
 - [Z.AI pricing](https://docs.z.ai/guides/overview/pricing)
 - [Alibaba regional base URLs](https://www.alibabacloud.com/help/en/model-studio/base-url)
 - [Pollinations API docs](https://github.com/pollinations/pollinations/blob/main/APIDOCS.md)
+- [Kilo anonymous gateway access](https://github.com/Kilo-Org/kilocode/blob/main/packages/kilo-docs/pages/gateway/authentication.md)
+- [OpenCode free chat models](https://console.opencode.ai/guides)
+- [Ollama cloud and API-key behavior](https://docs.ollama.com/cloud)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves

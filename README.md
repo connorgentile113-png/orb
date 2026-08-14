@@ -14,7 +14,9 @@ orb
 
 If Ollama is running, `orb` discovers its installed models and is ready
 immediately. This machine currently has `qwen2.5:1.5b`; no cloud signup or key is
-needed for it.
+needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
+and Pollinations are also discovered automatically; their public quotas and
+availability vary.
 
 ## Commands
 
@@ -44,6 +46,10 @@ Provider keys can be supplied with the environment variable shown by `orb key
 list`, or stored in `~/.orb/config.json`. The file and directory are created with
 user-only permissions. Keys are sent only to that provider's configured API
 endpoint and are never printed by the CLI.
+
+Providers that permit anonymous free-model access can optionally accept a key to
+raise limits. `orb key set kilo`, `orb key set llm7`, and similar commands keep
+that optional key in the same private config file.
 
 ## Local OpenAI API
 
