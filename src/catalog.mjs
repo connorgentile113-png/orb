@@ -1385,6 +1385,21 @@ export const PROVIDERS = Object.freeze([
       'microsoft/Phi-4-mini-instruct',
     ],
   },
+  {
+    id: 'openai-compatible', name: 'Custom OpenAI-Compatible API', badge: 'CUSTOM', kind: 'cloud', keyless: true,
+    baseUrl: '', baseEnv: 'OPENAI_COMPATIBLE_BASE_URL', requiresBaseUrl: true,
+    env: 'OPENAI_COMPATIBLE_API_KEY', optionalKey: true,
+    signup: 'https://platform.openai.com/docs/api-reference/chat',
+    free: 'Connect any additional service that implements /models and /chat/completions; its own terms apply.',
+    models: ['default'],
+  },
+  {
+    id: 'byteplus', name: 'BytePlus ModelArk', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://ark.ap-southeast.bytepluses.com/api/v3', env: 'BYTEPLUS_ARK_API_KEY',
+    signup: 'https://console.byteplus.com/ark/region:ark+ap-southeast-1/apikey',
+    free: 'ModelArk usage is metered through the BytePlus account; promotional offers may vary.',
+    models: ['seed-2-0-lite-260228'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
