@@ -40,7 +40,7 @@ needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
-The v0.12 catalog contains 162 providers, 41 local runtimes, and 668 seeded model
+The v0.12 catalog contains 165 providers, 43 local runtimes, and 673 seeded model
 routes. Public model catalogs are refreshed when possible, so the seed list is
 only a safe offline starting point.
 

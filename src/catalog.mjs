@@ -1303,6 +1303,29 @@ export const PROVIDERS = Object.freeze([
     free: 'The open-source gateway runs locally; configured upstream providers retain their own pricing.',
     models: ['openai/gpt-4o-mini'],
   },
+  {
+    id: 'higress-ai', name: 'Higress AI Gateway', badge: 'LOCAL GATEWAY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', baseEnv: 'HIGRESS_AI_URL',
+    env: 'HIGRESS_AI_API_KEY', optionalKey: true,
+    signup: 'https://github.com/alibaba/higress',
+    free: 'The community gateway is self-hosted; configured upstream model usage may be billed separately.',
+    models: ['qwen-max'],
+  },
+  {
+    id: 'envoy-ai', name: 'Envoy AI Gateway', badge: 'LOCAL GATEWAY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:1975/v1', baseEnv: 'ENVOY_AI_GATEWAY_URL',
+    env: 'ENVOY_AI_GATEWAY_API_KEY', optionalKey: true,
+    signup: 'https://github.com/envoyproxy/ai-gateway',
+    free: 'The open-source gateway runs locally or in Kubernetes; upstream provider pricing still applies.',
+    models: ['gpt-4o-mini'],
+  },
+  {
+    id: 'parasail', name: 'Parasail', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.parasail.io/v1', env: 'PARASAIL_API_KEY',
+    signup: 'https://www.saas.parasail.io/keys',
+    free: 'Serverless and batch inference are usage-priced; model availability is discoverable through the API.',
+    models: ['parasail-llama-33-70b-fp8', 'parasail-deepseek-r1', 'Olmo-3-32B-Think'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
