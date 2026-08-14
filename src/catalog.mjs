@@ -1564,6 +1564,22 @@ export const PROVIDERS = Object.freeze([
     free: 'Runs models locally through TurboMind or PyTorch engines with no per-token service fee.',
     models: ['Qwen/Qwen3-Coder-30B-A3B-Instruct', 'internlm/internlm2_5-7b-chat'],
   },
+  {
+    id: 'llama-box', name: 'llama-box', badge: 'LOCAL · LEGACY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', baseEnv: 'LLAMA_BOX_URL',
+    env: 'LLAMA_BOX_API_KEY', optionalKey: true,
+    signup: 'https://github.com/gpustack/llama-box',
+    free: 'Runs GGUF models locally; the project is no longer actively maintained and recommends llama.cpp for new setups.',
+    models: ['qwen2.5', 'demo'],
+  },
+  {
+    id: 'llama-nexus', name: 'Llama Nexus Gateway', badge: 'LOCAL GATEWAY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:3389/v1', baseEnv: 'LLAMA_NEXUS_URL',
+    env: 'LLAMA_NEXUS_API_KEY', optionalKey: true,
+    signup: 'https://llamaedge.com/docs/llama-nexus/register',
+    free: 'The self-hosted gateway routes registered OpenAI-compatible services; upstream provider costs still apply.',
+    models: ['registered-model'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
