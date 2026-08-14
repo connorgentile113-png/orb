@@ -1614,6 +1614,20 @@ export const PROVIDERS = Object.freeze([
     free: 'Fund a session key with Lightning or use a Cashu token directly; requests spend the attached balance.',
     models: ['gpt-4o', 'gpt-4'],
   },
+  {
+    id: 'arcee', name: 'Arcee Platform', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.arcee.ai/api/v1', env: 'ARCEE_API_KEY',
+    signup: 'https://app.arcee.ai',
+    free: 'Wallet-funded inference through Arcee’s direct model API; account credits and pricing apply.',
+    models: ['trinity-mini', 'arcee-ai/trinity-mini-thinking', 'arcee-ai/AFM-4.5B'],
+  },
+  {
+    id: 'arcee-conductor', name: 'Arcee Conductor', badge: 'AUTO ROUTER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://conductor.arcee.ai/v1', env: 'ARCEE_CONDUCTOR_API_KEY',
+    signup: 'https://models.arcee.ai',
+    free: 'The free plan can directly invoke Arcee SLMs; third-party frontier routes require an eligible paid account.',
+    models: ['auto', 'coder', 'virtuoso-large', 'virtuoso-medium', 'blitz', 'gpt-4.1', 'claude-3-7-sonnet-20250219'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
