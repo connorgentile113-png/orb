@@ -674,6 +674,26 @@ export const PROVIDERS = Object.freeze([
     free: 'Serverless or reserved inference usage is billed through Crusoe Intelligence Foundry.', models: [],
   },
   {
+    id: 'cloudru', name: 'Cloud.ru Foundation Models', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://foundation-models.api.cloud.ru/v1', env: 'CLOUDRU_API_KEY',
+    signup: 'https://console.cloud.ru',
+    free: 'Foundation Models usage is token-metered through Cloud.ru Evolution.',
+    models: ['deepseek-ai/DeepSeek-V4-Pro', 'zai-org/GLM-5.1', 'moonshotai/Kimi-K2.6'],
+  },
+  {
+    id: 'yandex', name: 'Yandex AI Studio', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://ai.api.cloud.yandex.net/v1', env: 'YANDEX_AI_STUDIO_API_KEY',
+    signup: 'https://console.yandex.cloud/folders',
+    free: 'AI Studio usage is metered; model URIs include the account folder ID.', models: [],
+  },
+  {
+    id: 'volcengine', name: 'Volcano Engine ModelArk', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://ark.cn-beijing.volces.com/api/v3', env: 'VOLCENGINE_ARK_API_KEY',
+    signup: 'https://console.volcengine.com/ark/region:ark+cn-beijing/apikey',
+    free: 'ModelArk usage is metered through Volcano Engine.',
+    models: ['doubao-seed-2-0-lite-260215', 'doubao-seed-1-6-251015'],
+  },
+  {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
     baseUrl: 'https://api-inference.modelscope.cn/v1', env: 'MODELSCOPE_SDK_TOKEN',
     signup: 'https://modelscope.cn/my/myaccesstoken',
