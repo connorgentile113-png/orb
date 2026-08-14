@@ -154,7 +154,7 @@ export async function availableModels(config, options = {}) {
       const models = await discoverModels(provider, config, options);
       discovered.set(provider.id, models.length ? models : [...provider.models]);
     } catch {
-      discovered.set(provider.id, [...provider.models]);
+      discovered.set(provider.id, options.refresh && provider.kind === 'local' ? [] : [...provider.models]);
     }
   }));
   return discovered;

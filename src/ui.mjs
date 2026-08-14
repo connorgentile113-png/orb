@@ -69,6 +69,9 @@ ${paint(c.bold, 'Usage')}  orb <command> [options]
 
   ${paint(c.cyan, 'orb')}                         choose a model and chat
   ${paint(c.cyan, 'orb chat')} [message]          chat with the selected model
+  ${paint(c.cyan, 'orb code')} [message]          rank connected coding models and chat
+  ${paint(c.cyan, 'orb code --accuracy')}         prefer maximum coding quality
+  ${paint(c.cyan, 'orb code --cost')}             prefer cost-efficient coding
   ${paint(c.cyan, 'orb use')} [provider/model]    choose the default model
   ${paint(c.cyan, 'orb use auto/free')}           enable automatic free fallback
   ${paint(c.cyan, 'orb models')} [--refresh]      list available models

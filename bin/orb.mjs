@@ -4,6 +4,7 @@ import process, { stdin, stdout, stderr } from 'node:process';
 import { PROVIDERS, PROVIDER_BY_ID, parseRoute, routeName } from '../src/catalog.mjs';
 import { loadConfig, saveConfig, configPath, providerBaseUrl, providerKey } from '../src/config.mjs';
 import { autoRouteCandidates, availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
+import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
 import { c, choose, logo, paint, secretPrompt, table, usage } from '../src/ui.mjs';
 
@@ -66,6 +67,44 @@ async function useCommand(args, config) {
   config.selected = routeName(providerId, model);
   saveConfig(config);
   stdout.write(`${paint(c.green, '✓')} using ${paint(c.bold, config.selected)}\n`);
+}
+
+function codeOptions(args) {
+  const accuracy = args.includes('--accuracy');
+  const cost = args.includes('--cost') || args.includes('--efficient');
+  if (accuracy && cost) throw new Error('Choose either --accuracy or --cost, not both.');
+  const mode = option(args, '--mode', '');
+  if (mode && !['accuracy', 'cost'].includes(mode)) throw new Error('Use --mode accuracy or --mode cost.');
+  const preference = accuracy ? 'accuracy' : cost ? 'cost' : mode;
+  const message = [];
+  for (let index = 0; index < args.length; index += 1) {
+    if (['--accuracy', '--cost', '--efficient', '--list'].includes(args[index])) continue;
+    if (args[index] === '--mode') { index += 1; continue; }
+    message.push(args[index]);
+  }
+  return { preference, listOnly: args.includes('--list'), message };
+}
+
+async function codeCommand(args, config) {
+  const options = codeOptions(args);
+  const preference = options.preference || (stdin.isTTY ? await choose('Optimize coding for', [
+    { value: 'accuracy', label: 'Maximum accuracy', hint: 'strongest reasoning and coding ability' },
+    { value: 'cost', label: 'Cost efficiency', hint: 'free and lightweight routes first' },
+  ]) : 'accuracy');
+  stdout.write(`${paint(c.dim, 'Scanning connected providers…')}\n`);
+  const catalog = await readyCatalog(config, true);
+  const ranked = rankCodingModels(catalog, preference);
+  if (!ranked.length) throw new Error('No connected chat models found. Start a local server or add a provider key.');
+  const shortlist = ranked.slice(0, 10);
+  table(shortlist.map((entry, index) => [
+    index + 1, entry.route, entry.score, entry.reasons.join(' · '),
+  ]), [{ label: '#' }, { label: 'CODING MODEL' }, { label: 'FIT' }, { label: 'WHY' }]);
+  const winner = shortlist[0];
+  config.selected = winner.route;
+  saveConfig(config);
+  stdout.write(`\n${paint(c.green, '✓')} ${preference === 'accuracy' ? 'accuracy' : 'cost-efficient'} pick: ${paint(c.bold, winner.route)}\n`);
+  if (options.listOnly) return;
+  return chatCommand(options.message, config);
 }
 
 async function modelsCommand(args, config) {
@@ -242,7 +281,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.9.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.10.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());
@@ -259,6 +298,7 @@ async function main() {
   if (command === 'key' || command === 'keys') return keyCommand(args, config);
   if (command === 'endpoint' || command === 'endpoints') return endpointCommand(args, config);
   if (command === 'doctor') return doctorCommand(config);
+  if (command === 'code') return codeCommand(args, config);
   if (command === 'chat' || command === 'ask') return chatCommand(args, config);
   if (command === 'serve') return serveCommand(args, config);
   throw new Error(`Unknown command: ${command}\n${usage()}`);

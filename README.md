@@ -18,7 +18,7 @@ needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
-The v0.9 catalog contains 87 providers, 21 local runtimes, and 573 seeded model
+The v0.10 catalog contains 87 providers, 21 local runtimes, and 573 seeded model
 routes. Public model catalogs are refreshed when possible, so the seed list is
 only a safe offline starting point.
 
@@ -27,6 +27,9 @@ only a safe offline starting point.
 ```text
 orb                         choose a model and chat
 orb chat "hello"            one-shot chat
+orb code                    rank connected coding models and chat
+orb code --accuracy         prioritize coding quality and reasoning
+orb code --cost             prioritize free and efficient coding routes
 orb use                     choose the default model
 orb use auto/free           use local-first automatic free fallback
 orb models --refresh        discover models from ready providers
@@ -38,6 +41,17 @@ orb key set groq            securely prompt for a direct API key
 orb endpoint set cloudflare https://.../ai/v1
 orb doctor                  test provider model endpoints
 orb serve --port 11435      expose an auth-free localhost OpenAI API
+```
+
+`orb code` refreshes every connected provider, ranks its chat models for coding,
+prints a ten-model shortlist with scoring reasons, selects the winner, and names
+the exact route before entering chat. With no flag it asks whether to optimize
+for maximum accuracy or cost efficiency. Use `--list` to rank and select without
+starting a conversation, or include a prompt for a one-shot coding request:
+
+```bash
+orb code --accuracy "review this function"
+orb code --cost --list
 ```
 
 Use `provider/model` anywhere a model is accepted. Model names may contain
