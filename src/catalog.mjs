@@ -226,7 +226,7 @@ export const PROVIDERS = Object.freeze([
   },
   {
     id: 'github', name: 'GitHub Models', badge: 'FREE RETIRED', kind: 'cloud', keyless: false,
-    baseUrl: 'https://models.github.ai/inference', env: 'GITHUB_TOKEN',
+    baseUrl: 'https://models.github.ai/inference', modelsUrl: 'https://models.github.ai/catalog/models', env: 'GITHUB_TOKEN',
     signup: 'https://github.com/marketplace/models',
     free: 'The free tier retired July 30, 2026; kept for accounts that still have API access.',
     models: ['openai/gpt-4.1-mini', 'openai/gpt-4o-mini', 'deepseek/DeepSeek-V3-0324', 'meta/Llama-4-Scout-17B-16E-Instruct'],

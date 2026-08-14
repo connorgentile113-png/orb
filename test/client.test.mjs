@@ -50,6 +50,21 @@ test('public model catalogs can be refreshed before adding an API key', async t 
   assert.deepEqual(await discoverModels(PROVIDER_BY_ID.get('airforce'), config), ['free-model:free']);
 });
 
+test('providers can discover models from a separate catalog endpoint', async t => {
+  const upstream = http.createServer((request, response) => {
+    assert.equal(request.url, '/catalog/models');
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify([{ id: 'publisher/coding-model' }]));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const provider = {
+    ...PROVIDER_BY_ID.get('github'),
+    modelsUrl: `http://127.0.0.1:${upstream.address().port}/catalog/models`,
+  };
+  assert.deepEqual(await discoverModels(provider, { ...emptyConfig(), keys: { github: 'test-token' } }), ['publisher/coding-model']);
+});
+
 test('provider safety headers are forwarded to free-model gateways', async t => {
   const upstream = http.createServer(async (request, response) => {
     assert.equal(request.headers.authorization, 'Bearer test-key');

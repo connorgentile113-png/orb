@@ -79,7 +79,7 @@ const PROVIDERS_WITH_AUTO_MODELS = [...PROVIDER_BY_ID.values()]
 
 export function modelIdsFromResponse(provider, body) {
   if (provider.discover === false) return [...provider.models];
-  let items = body.data || body.models || body.text || [];
+  let items = Array.isArray(body) ? body : body.data || body.models || body.text || [];
   if (provider.modelPolicy === 'free-suffix') {
     items = items.filter(item => {
       const id = typeof item === 'string' ? item : item.id || item.name || '';
@@ -141,8 +141,7 @@ export async function discoverModels(provider, config, { env = process.env, time
   const key = providerKey(provider, config, env);
   if (!provider.keyless && !key && !provider.publicCatalog) return [];
   if (!providerBaseUrl(provider, config, env)) return [];
-  let url = `${providerBaseUrl(provider, config, env)}/models`;
-  if (provider.id === 'ollama' || provider.protocol === 'ollama') url = provider.modelsUrl;
+  const url = provider.modelsUrl || `${providerBaseUrl(provider, config, env)}/models`;
   const response = await fetch(url, { headers: headersFor(provider, key), signal: timeoutSignal(timeout) });
   const body = await jsonOrError(response);
   if (provider.id === 'ollama' || provider.protocol === 'ollama') return (body.models || []).map(item => item.model || item.name).filter(Boolean);
