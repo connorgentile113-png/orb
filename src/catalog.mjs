@@ -1590,6 +1590,13 @@ export const PROVIDERS = Object.freeze([
       'Gemini-3.1-Pro', 'Grok-4.20-Multi-Agent', 'Claude-Haiku-4.5', 'GPT-5-mini',
     ],
   },
+  {
+    id: 'vast-serverless', name: 'Vast.ai Serverless', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'VAST_SERVERLESS_URL', requiresBaseUrl: true, env: 'VAST_API_KEY',
+    signup: 'https://docs.vast.ai/guides/serverless/openai-compatible-api',
+    free: 'Provide the endpoint-specific openai.vast.ai URL ending in /v1; serverless GPU usage is metered.',
+    models: ['Qwen/Qwen3-8B', 'Qwen/Qwen3-30B-A3B'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
