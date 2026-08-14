@@ -13,10 +13,21 @@ test('automatic route override excludes recursive auto entries', async () => {
 });
 
 test('automatic routing adds configured free-only providers before keyless fallbacks', async () => {
-  const config = { ...emptyConfig(), keys: { airforce: 'test', bazaarlink: 'test', morph: 'test' } };
+  const config = { ...emptyConfig(), keys: {
+    airforce: 'test', bazaarlink: 'test', electronhub: 'test', navy: 'test',
+    helyx: 'test', 'yolo-auto': 'test', morph: 'test', mnn: 'test', speka: 'test',
+    freeinference: 'test',
+  } };
   const routes = await autoRouteCandidates(config, { ORB_DISABLE_LOCAL: '1' });
-  assert.deepEqual(routes.slice(0, 2), ['bazaarlink/auto:free', 'airforce/gemma3-270m:free']);
+  assert.deepEqual(routes.slice(0, 6), [
+    'electronhub/deepseek-v4-flash:free', 'navy/nemotron-3-super',
+    'helyx/gemma-4-31B-it', 'yolo-auto/qwen3.6-35b-a3b',
+    'bazaarlink/auto:free', 'airforce/gemma3-270m:free',
+  ]);
   assert.equal(routes.includes('morph/morph-v3-fast'), false);
+  assert.equal(routes.some(route => route.startsWith('mnn/')), false);
+  assert.equal(routes.some(route => route.startsWith('speka/')), false);
+  assert.equal(routes.some(route => route.startsWith('freeinference/')), false);
   assert.equal(routes.includes('opencode/big-pickle'), true);
 });
 

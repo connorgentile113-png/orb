@@ -36,6 +36,15 @@ test('filters dynamic catalogs down to free routes', () => {
     { id: 'zero-paid-plan', min_plan: 'GO', pricing: { prompt: '0', completion: '0' } },
   ] }), ['zero-basic']);
 
+  const planProvider = { modelPolicy: 'free-plan' };
+  assert.deepEqual(modelIdsFromResponse(planProvider, { data: [
+    { id: 'free-tier-array', tiers: ['Free', 'Basic'] },
+    { id: 'free-premium-flag', premium: false },
+    { id: 'free-premium-model-flag', premium_model: false },
+    { id: 'paid-tier-array', tiers: ['Basic'] },
+    { id: 'premium', premium: true },
+  ] }), ['free-tier-array', 'free-premium-flag', 'free-premium-model-flag']);
+
   const chatProvider = { chatOnly: true };
   assert.deepEqual(modelIdsFromResponse(chatProvider, { data: [
     { id: 'chat-model', max_completion_tokens: 4096 },
@@ -45,7 +54,10 @@ test('filters dynamic catalogs down to free routes', () => {
     { id: 'text-to-image', output_modalities: ['image'] },
     { id: 'dall-e-3', supported_endpoints: ['images.generations'], architecture: { output_modalities: ['image'] } },
     { id: 'endpoint-chat', supported_endpoints: ['chat.completions'], architecture: { output_modalities: ['text'] } },
-  ] }), ['chat-model', 'endpoint-chat']);
+    { id: 'slash-endpoint-chat', endpoints: ['/v1/chat/completions'], output_modalities: ['text'] },
+    { id: 'typed-chat', type: 'chat.completions', output_modalities: ['text'] },
+    { id: 'short-endpoint-chat', endpoint: 'chat' },
+  ] }), ['chat-model', 'endpoint-chat', 'slash-endpoint-chat', 'typed-chat', 'short-endpoint-chat']);
 });
 
 test('does not treat an unknown model namespace as a provider', () => {

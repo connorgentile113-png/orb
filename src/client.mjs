@@ -100,14 +100,25 @@ export function modelIdsFromResponse(provider, body) {
       return input !== undefined && output !== undefined && Number(input) === 0 && Number(output) === 0;
     });
   }
+  if (provider.modelPolicy === 'free-plan') {
+    items = items.filter(item => {
+      if (typeof item !== 'object') return false;
+      if (Array.isArray(item.tiers)) return item.tiers.some(tier => String(tier).toLowerCase() === 'free');
+      return (item.premium ?? item.premium_model) === false;
+    });
+  }
   if (provider.chatOnly) {
     items = items.filter(item => {
       if (typeof item === 'string') return true;
       const id = item.id || item.name || '';
-      const endpoints = item.supported_endpoints;
-      const endpointSupportsChat = !Array.isArray(endpoints) || endpoints.includes('chat.completions');
+      const endpoints = item.supported_endpoints || item.endpoints;
+      const endpoint = item.endpoint;
+      const endpointSupportsChat = (!Array.isArray(endpoints)
+        || endpoints.some(value => String(value).endsWith('chat/completions') || value === 'chat.completions'))
+        && (!endpoint || endpoint === 'chat' || String(endpoint).endsWith('chat/completions') || endpoint === 'chat.completions');
       const supportsCompletion = item.max_completion_tokens === undefined || item.max_completion_tokens > 0;
-      const chatType = item.model_type === undefined || item.model_type === 'chat';
+      const type = item.model_type ?? item.type;
+      const chatType = type === undefined || type === 'chat' || type === 'chat.completions';
       const supportsChat = item.supports_chat === undefined || item.supports_chat === true;
       const outputModalities = item.output_modalities || item.architecture?.output_modalities;
       const textOutput = !Array.isArray(outputModalities) || outputModalities.includes('text');

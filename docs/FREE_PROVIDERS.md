@@ -38,6 +38,10 @@ bypassing a provider’s limits.
 | GPT4All | `gpt4all` | local, keyless | `http://127.0.0.1:4891/v1` |
 | Text Generation WebUI | `textgen` | local, keyless | `http://127.0.0.1:5000/v1` |
 | llama-swap | `llama-swap` | local, keyless | `http://127.0.0.1:8080/v1` |
+| SGLang | `sglang` | local, keyless | `http://127.0.0.1:30000/v1` |
+| Aphrodite Engine | `aphrodite` | local, keyless | `http://127.0.0.1:2242/v1` |
+| MLX LM | `mlx-lm` | local, keyless | `http://127.0.0.1:8080/v1` |
+| TabbyAPI | `tabbyapi` | local, optional key | `http://127.0.0.1:5000/v1` |
 | Pollinations legacy community endpoint | `pollinations` | keyless, rate-limited | `https://text.pollinations.ai/openai` |
 | Google Gemini | `gemini` | free tier | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | GroqCloud | `groq` | free tier | `https://api.groq.com/openai/v1` |
@@ -86,6 +90,14 @@ bypassing a provider’s limits.
 | VoidAI | `voidai` | 125K credits/day | `https://api.voidai.app/v1` |
 | Poolside | `poolside` | limited-time Laguna preview | `https://inference.poolside.ai/v1` |
 | Mixlayer | `mixlayer` | explicit free Qwen route | `https://models.mixlayer.ai/v1` |
+| Electron Hub | `electronhub` | 25 explicit `:free` routes | `https://api.electronhub.ai/v1` |
+| NavyAI | `navy` | 150K weighted tokens/day | `https://api.navy/v1` |
+| HelyxAI | `helyx` | 2M tokens/day, no paid tier | `https://helyxai.space/v1` |
+| Yolo-Auto | `yolo-auto` | card-free daily Qwen requests | `https://yolo-auto.com/v1` |
+| FreeInference | `freeinference` | research-community free service | `https://freeinference.org/v1` |
+| MNN AI | `mnn` | one monthly free credit | `https://api.mnnai.ru/v1` |
+| Speka | `speka` | $1 model usage/month | `https://speka.me/v1` |
+| Intern AI | `intern-ai` | research-oriented free allowance | `https://chat.intern-ai.org.cn/api/v1` |
 | LongCat | `longcat` | one-time evaluation grant | `https://api.longcat.chat/openai/v1` |
 | Reka | `reka` | metered; free account only | `https://api.reka.ai/v1` |
 
@@ -133,11 +145,27 @@ access requires payment verification.
 - [VoidAI free plan](https://voidai.app/pricing) and
   [quickstart](https://docs.voidai.app/quickstart)
 - [Poolside model preview](https://poolside.ai/models)
+- [Electron Hub free-model access](https://docs.electronhub.ai/billing/model-access)
+  and [daily Neutrinos](https://docs.electronhub.ai/billing/credits)
+- [NavyAI free-plan pricing](https://api.navy/) and
+  [public model metadata](https://api.navy/docs/models)
+- [HelyxAI free API](https://helyxai.space/)
+- [Yolo-Auto free API](https://yolo-auto.com/free-ai-chat) and
+  [current model list](https://yolo-auto.com/models)
+- [FreeInference documentation](https://doc.freeinference.org/) and
+  [service disclosure](https://freeinference.org/)
+- [MNN API, tiers, and limits](https://mnnai.ru/docs)
+- [Speka free plan](https://speka.me/pricing)
+- [Intern AI authentication](https://internlm.intern-ai.org.cn/docEn/docs/Authentication/)
 - [LongCat API overview](https://longcat.chat/platform/docs/APIDocs.html)
 - [Reka API quickstart](https://docs.reka.ai/quickstart) and
   [current metered pricing](https://docs.reka.ai/pricing)
 - [GPT4All local API server](https://github.com/nomic-ai/gpt4all/wiki/Local-API-Server)
 - [llama-swap OpenAI-compatible endpoints](https://github.com/mostlygeek/llama-swap)
+- [SGLang quickstart](https://github.com/sgl-project/sglang/blob/main/docs_new/docs/get-started/quickstart.mdx)
+- [Aphrodite OpenAI server](https://aphrodite.pygmalion.chat/usage/1-getting-started/)
+- [MLX LM HTTP server](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/SERVER.md)
+- [TabbyAPI usage and authentication](https://github.com/theroyallab/tabbyAPI/wiki/03.-Usage)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves

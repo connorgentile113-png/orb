@@ -18,7 +18,7 @@ needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
-The v0.5 catalog contains 63 providers, 10 local runtimes, and 321 seeded model
+The v0.6 catalog contains 75 providers, 14 local runtimes, and 456 seeded model
 routes. Public model catalogs are refreshed when possible, so the seed list is
 only a safe offline starting point.
 
@@ -55,9 +55,9 @@ LLM7, Pollinations, and OVHcloud routes. Set `ORB_AUTO_ROUTES` to a comma-separa
 list of `provider/model` routes to customize that order, or set
 `ORB_DISABLE_LOCAL=1` to skip Ollama in automatic routing.
 When a key is configured, explicit free-only routes from AnyAPI, Api.Airforce,
-BazaarLink, FastRouter, LiteRouter, MegaNova, NagaAI, Poixe, Public AI,
-Routeway, and Zylo are inserted ahead of the anonymous fallbacks. Providers
-whose free allowance can spill into metered usage are not added automatically.
+BazaarLink, Electron Hub, FastRouter, HelyxAI, LiteRouter, MegaNova, NagaAI,
+NavyAI, Poixe, Public AI, Routeway, Yolo-Auto, and Zylo are inserted ahead of
+the anonymous fallbacks. Providers whose free allowance can spill into metered usage are not added automatically.
 BazaarLink requests also send `X-Free-Fallback: false`. Live catalogs are
 filtered by explicit free suffix, zero price, plan tier, chat endpoint, and
 output modality where the provider exposes those fields.
