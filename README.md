@@ -14,7 +14,7 @@ provider APIs through one clean CLI and an OpenAI-compatible localhost server.
 Requirements: Node.js 22 or newer. From a GitHub checkout:
 
 ```bash
-git clone <repository-url> orb
+git clone https://github.com/connorgentile113-png/orb.git
 cd orb
 npm install -g .
 orb --version
