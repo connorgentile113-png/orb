@@ -1703,6 +1703,13 @@ export const PROVIDERS = Object.freeze([
     free: 'Uses the Spark X2 Flash HTTP quota associated with its API password or AK:SK credential.',
     models: ['spark-x'],
   },
+  {
+    id: 'lingyi', name: '01.AI Lingyi Wanwu', badge: 'CHINA', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.lingyiwanwu.com/v1', env: 'LINGYI_API_KEY',
+    signup: 'https://platform.lingyiwanwu.com',
+    free: 'Yi model and smart-routing usage follows the credits and billing configured on the Lingyi Wanwu account.',
+    models: ['yi-lightning', 'yi-vision-v2'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
