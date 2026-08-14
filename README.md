@@ -11,35 +11,12 @@ provider APIs through one clean CLI and an OpenAI-compatible localhost server.
 
 ## Install
 
-Requirements: Node.js 22 or newer. Install directly from the public GitHub repository on macOS, Linux, or Windows:
+Requirements: Node.js 22 or newer. Install from npm on macOS, Linux, or Windows:
 
 ```bash
 npm install -g orb-ai
 orb --version
 orb
-```
-
-Until the npm release is published, or to install directly from GitHub:
-
-```bash
-npm install -g github:connorgentile113-png/orb
-```
-
-Or install from a checkout:
-
-```bash
-git clone https://github.com/connorgentile113-png/orb.git
-cd orb
-npm install -g .
-orb --version
-orb
-```
-
-There are no runtime npm dependencies. To update an existing checkout:
-
-```bash
-git pull
-npm install -g .
 ```
 
 To uninstall:
