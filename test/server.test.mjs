@@ -22,7 +22,10 @@ test('proxies a non-streaming OpenAI chat request', async t => {
     assert.equal(request.url, '/v1/chat/completions');
     assert.equal(body.model, 'tiny');
     response.setHeader('content-type', 'application/json');
-    response.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'hello' } }] }));
+    response.end(JSON.stringify({
+      choices: [{ message: { role: 'assistant', content: 'hello' } }],
+      usage: { prompt_tokens: 2, completion_tokens: 1, total_tokens: 3 },
+    }));
   });
   await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
   t.after(() => upstream.close());
@@ -39,5 +42,7 @@ test('proxies a non-streaming OpenAI chat request', async t => {
     body: JSON.stringify({ messages: [{ role: 'user', content: 'hi' }] }),
   });
   assert.equal(response.status, 200);
-  assert.equal((await response.json()).choices[0].message.content, 'hello');
+  const completion = await response.json();
+  assert.equal(completion.choices[0].message.content, 'hello');
+  assert.deepEqual(completion.usage, { prompt_tokens: 2, completion_tokens: 1, total_tokens: 3 });
 });

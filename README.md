@@ -1,5 +1,9 @@
 # orb
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/connorgentile113-png/orb/main/assets/orb-logo.png" alt="Orb logo" width="180">
+</p>
+
 One terminal, every model you can access. `orb` discovers local engines and
 direct provider APIs, gives you a searchable mouse-friendly model picker, and
 opens a focused streaming chat—without an Orb account or OAuth flow.
@@ -26,8 +30,7 @@ npm uninstall -g orb-ai
 ```
 
 If Ollama is running, `orb` discovers its installed models and is ready
-immediately. This machine currently has `qwen2.5:1.5b`; no cloud signup or key is
-needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
+immediately. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
@@ -133,16 +136,127 @@ that optional key in the same private config file.
 
 ## Local OpenAI API
 
+Start Orb's OpenAI-compatible server:
+
 ```bash
 orb serve
-curl http://127.0.0.1:11435/v1/chat/completions \
-  -H 'content-type: application/json' \
-  -d '{"model":"ollama/qwen2.5:1.5b","messages":[{"role":"user","content":"hello"}]}'
 ```
 
-Clients may omit `model` after `orb use`. The localhost API intentionally ignores
-the `Authorization` header, so tools that insist on a value can use any dummy
-string. Browser CORS is not enabled. Bind to the default `127.0.0.1`; exposing an
+It listens on `http://127.0.0.1:11435` by default. Use a different local port
+with `orb serve --port 8080`.
+
+### API endpoints
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/health` | Check server status and see the selected default model. |
+| `GET` | `/v1/models` | List every model currently available from connected providers. |
+| `POST` | `/v1/chat/completions` | Create a standard or streaming chat completion. |
+
+### Check status and the selected model
+
+```bash
+curl http://127.0.0.1:11435/health
+```
+
+Example response:
+
+```json
+{
+  "ok": true,
+  "service": "orb",
+  "auth": false,
+  "selected": "ollama/qwen2.5:1.5b"
+}
+```
+
+### List available models
+
+```bash
+curl http://127.0.0.1:11435/v1/models
+```
+
+Every returned `id` is a complete `provider/model` route that can be copied
+directly into a chat request:
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "ollama/qwen2.5:1.5b",
+      "object": "model",
+      "owned_by": "ollama"
+    }
+  ]
+}
+```
+
+### Select a model
+
+Set the server's persistent default before starting it:
+
+```bash
+orb use ollama/qwen2.5:1.5b
+orb serve
+```
+
+You can omit `model` from requests after using `orb use`. To select or override
+the model for one request, send any ID returned by `/v1/models`:
+
+```bash
+curl http://127.0.0.1:11435/v1/chat/completions \
+  -H 'content-type: application/json' \
+  -d '{
+    "model": "ollama/qwen2.5:1.5b",
+    "messages": [
+      {"role": "system", "content": "Answer concisely."},
+      {"role": "user", "content": "Hello"}
+    ],
+    "temperature": 0.2,
+    "stream": false
+  }'
+```
+
+The response uses the OpenAI chat-completion shape. When the upstream provider
+reports token counts, they are available in `usage`:
+
+```json
+{
+  "choices": [
+    {"message": {"role": "assistant", "content": "Hello!"}}
+  ],
+  "usage": {
+    "prompt_tokens": 18,
+    "completion_tokens": 3,
+    "total_tokens": 21
+  }
+}
+```
+
+Usage values come from the selected provider. Some providers, especially free
+or streaming routes, may omit them or report them only in the final event.
+
+### Stream a response
+
+```bash
+curl -N http://127.0.0.1:11435/v1/chat/completions \
+  -H 'content-type: application/json' \
+  -d '{
+    "model": "auto/free",
+    "messages": [{"role": "user", "content": "Write a short greeting"}],
+    "stream": true
+  }'
+```
+
+Streaming uses Server-Sent Events and ends with `data: [DONE]`. When
+`auto/free` chooses a route, Orb returns the selected `provider/model` in the
+`X-Orb-Route` response header.
+
+The request body currently accepts `model`, `messages`, `stream`, and
+`temperature`. The localhost API intentionally ignores the `Authorization`
+header, so OpenAI clients that require a key can use any dummy value. Browser
+CORS is not enabled. Keep the default `127.0.0.1` binding; exposing this
 unauthenticated API on a public interface is unsafe.
 
 ## What “free” means
