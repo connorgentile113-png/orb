@@ -15,7 +15,10 @@ function timeoutSignal(ms) {
 
 function headersFor(provider, key) {
   const headers = { accept: 'application/json', 'content-type': 'application/json', ...provider.headers };
-  if (key) headers.authorization = `Bearer ${key}`;
+  if (key && provider.protocol === 'anthropic') {
+    headers['x-api-key'] = key;
+    headers['anthropic-version'] = '2023-06-01';
+  } else if (key) headers.authorization = `Bearer ${key}`;
   return headers;
 }
 
@@ -209,6 +212,68 @@ async function normalizeOllamaResponse(response, model, stream) {
   return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
 }
 
+function anthropicContent(content = []) {
+  return content.map(block => {
+    if (block.type === 'thinking') return `<thinking>${block.thinking || ''}</thinking>`;
+    return block.type === 'text' ? block.text || '' : '';
+  }).join('');
+}
+
+async function normalizeAnthropicResponse(response, model, stream) {
+  if (!stream) {
+    const value = await jsonOrError(response);
+    const payload = {
+      id: value.id, object: 'chat.completion', created: Math.floor(Date.now() / 1000), model,
+      choices: [{ index: 0, message: { role: 'assistant', content: anthropicContent(value.content) }, finish_reason: value.stop_reason || 'stop' }],
+      usage: {
+        prompt_tokens: value.usage?.input_tokens || 0,
+        completion_tokens: value.usage?.output_tokens || 0,
+        total_tokens: (value.usage?.input_tokens || 0) + (value.usage?.output_tokens || 0),
+      },
+    };
+    return new Response(JSON.stringify(payload), { status: 200, headers: { 'content-type': 'application/json; charset=utf-8' } });
+  }
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const body = new ReadableStream({
+    async start(controller) {
+      let buffer = '';
+      const thinkingBlocks = new Set();
+      const send = content => {
+        if (!content) return;
+        const payload = {
+          id: `orb-anthropic-${Date.now()}`, object: 'chat.completion.chunk',
+          created: Math.floor(Date.now() / 1000), model,
+          choices: [{ index: 0, delta: { content }, finish_reason: null }],
+        };
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+      };
+      try {
+        for await (const chunk of response.body) {
+          buffer += decoder.decode(chunk, { stream: true });
+          const lines = buffer.split(/\r?\n/);
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.startsWith('data:')) continue;
+            const raw = line.slice(5).trim();
+            if (!raw) continue;
+            const event = JSON.parse(raw);
+            if (event.type === 'content_block_start' && event.content_block?.type === 'thinking') {
+              thinkingBlocks.add(event.index);
+              send('<thinking>');
+            }
+            if (event.type === 'content_block_delta') send(event.delta?.text || event.delta?.thinking || '');
+            if (event.type === 'content_block_stop' && thinkingBlocks.delete(event.index)) send('</thinking>');
+          }
+        }
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      } catch (error) { controller.error(error); }
+    },
+  });
+  return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
+}
+
 export async function createChatCompletion({ route, messages, stream = false, config, env = process.env, signal, temperature }) {
   const { provider, model } = resolveRoute(route, config);
   if (provider.id === 'auto') {
@@ -230,10 +295,13 @@ export async function createChatCompletion({ route, messages, stream = false, co
   const key = providerKey(provider, config, env);
   if (!provider.keyless && !key) throw new Error(`${provider.name} needs ${provider.env}. Run \`orb key set ${provider.id}\`.`);
   if (!providerBaseUrl(provider, config, env)) throw new Error(`${provider.name} needs an account endpoint. Run \`orb endpoint set ${provider.id} <url>\`.`);
-  const url = provider.protocol === 'ollama'
-    ? `${providerBaseUrl(provider, config, env)}/chat`
-    : `${providerBaseUrl(provider, config, env)}/chat/completions`;
-  const body = { model, messages, stream };
+  const url = provider.protocol === 'ollama' ? `${providerBaseUrl(provider, config, env)}/chat`
+    : provider.protocol === 'anthropic' ? `${providerBaseUrl(provider, config, env)}/messages`
+      : `${providerBaseUrl(provider, config, env)}/chat/completions`;
+  const system = messages.filter(message => message.role === 'system').map(message => message.content).join('\n\n');
+  const body = provider.protocol === 'anthropic'
+    ? { model, messages: messages.filter(message => message.role !== 'system'), stream, max_tokens: 8192, ...(system ? { system } : {}) }
+    : { model, messages, stream };
   if (temperature !== undefined) body.temperature = temperature;
   const response = await fetch(url, {
     method: 'POST', headers: headersFor(provider, key), body: JSON.stringify(body),
@@ -241,6 +309,7 @@ export async function createChatCompletion({ route, messages, stream = false, co
   });
   if (!response.ok) await jsonOrError(response);
   if (provider.protocol === 'ollama') return normalizeOllamaResponse(response, model, stream);
+  if (provider.protocol === 'anthropic') return normalizeAnthropicResponse(response, model, stream);
   return response;
 }
 

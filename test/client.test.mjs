@@ -94,6 +94,50 @@ test('adapts Ollama Cloud native responses to OpenAI chat responses', async t =>
   assert.equal(streamed, 'cloud works');
 });
 
+test('adapts Anthropic messages and thinking to OpenAI chat responses', async t => {
+  const upstream = http.createServer(async (request, response) => {
+    assert.equal(request.url, '/v1/messages');
+    assert.equal(request.headers['x-api-key'], 'anthropic-test-key');
+    assert.equal(request.headers['anthropic-version'], '2023-06-01');
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    const body = JSON.parse(Buffer.concat(chunks));
+    assert.equal(body.system, 'Be concise.');
+    assert.deepEqual(body.messages, [{ role: 'user', content: 'hello' }]);
+    if (body.stream) {
+      response.setHeader('content-type', 'text/event-stream');
+      response.write(`data: ${JSON.stringify({ type: 'content_block_start', index: 0, content_block: { type: 'thinking', thinking: '' } })}\n\n`);
+      response.write(`data: ${JSON.stringify({ type: 'content_block_delta', index: 0, delta: { type: 'thinking_delta', thinking: 'check first' } })}\n\n`);
+      response.write(`data: ${JSON.stringify({ type: 'content_block_stop', index: 0 })}\n\n`);
+      response.write(`data: ${JSON.stringify({ type: 'content_block_start', index: 1, content_block: { type: 'text', text: '' } })}\n\n`);
+      response.write(`data: ${JSON.stringify({ type: 'content_block_delta', index: 1, delta: { type: 'text_delta', text: 'Hello!' } })}\n\n`);
+      return response.end(`data: ${JSON.stringify({ type: 'message_stop' })}\n\n`);
+    }
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({
+      id: 'msg_test', model: body.model, stop_reason: 'end_turn',
+      content: [{ type: 'thinking', thinking: 'check first' }, { type: 'text', text: 'Hello!' }],
+      usage: { input_tokens: 2, output_tokens: 3 },
+    }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { anthropic: 'anthropic-test-key' },
+    providers: { anthropic: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.equal(await completionText({
+    route: 'anthropic/claude-test',
+    messages: [{ role: 'system', content: 'Be concise.' }, { role: 'user', content: 'hello' }], config,
+  }), '<thinking>check first</thinking>Hello!');
+  let streamed = '';
+  await streamCompletion({
+    route: 'anthropic/claude-test',
+    messages: [{ role: 'system', content: 'Be concise.' }, { role: 'user', content: 'hello' }], config,
+  }, text => { streamed += text; });
+  assert.equal(streamed, '<thinking>check first</thinking>Hello!');
+});
+
 test('auto/free falls back after an upstream failure', async t => {
   const upstream = http.createServer(async (request, response) => {
     const chunks = [];
