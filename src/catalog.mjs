@@ -616,6 +616,33 @@ export const PROVIDERS = Object.freeze([
     free: 'Gateway and upstream model charges depend on the connected provider and workspace plan.', models: [],
   },
   {
+    id: 'bedrock', name: 'Amazon Bedrock Mantle', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'BEDROCK_MANTLE_BASE_URL', requiresBaseUrl: true,
+    env: 'AWS_BEARER_TOKEN_BEDROCK', signup: 'https://console.aws.amazon.com/bedrock/home#/api-keys',
+    free: 'Amazon Bedrock usage is metered; set the regional `bedrock-mantle` `/v1` base URL.',
+    models: ['openai.gpt-oss-120b', 'us.anthropic.claude-sonnet-4-6'],
+  },
+  {
+    id: 'oci', name: 'OCI Generative AI', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'OCI_GENERATIVE_AI_BASE_URL', requiresBaseUrl: true,
+    env: 'OCI_GENERATIVE_AI_API_KEY', signup: 'https://cloud.oracle.com/generative-ai',
+    free: 'OCI usage is metered; set the regional OpenAI-compatible `/openai/v1` base URL.',
+    models: ['xai.grok-4', 'openai.gpt-oss-120b'],
+  },
+  {
+    id: 'ibm-inference', name: 'IBM Cloud Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'IBM_INFERENCE_BASE_URL', requiresBaseUrl: true,
+    env: 'IBM_INFERENCE_BEARER_TOKEN', signup: 'https://cloud.ibm.com/catalog/services/inference',
+    free: 'Project inference is metered; set the regional project-specific `/inference` base URL.',
+    models: ['granite-4-0-h-small'],
+  },
+  {
+    id: 'azure-foundry', name: 'Microsoft Foundry', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'AZURE_FOUNDRY_BASE_URL', requiresBaseUrl: true,
+    env: 'AZURE_FOUNDRY_API_KEY', signup: 'https://ai.azure.com',
+    free: 'Deployment usage is metered; set the resource’s OpenAI-compatible `/openai/v1` base URL.', models: [],
+  },
+  {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
     baseUrl: 'https://api-inference.modelscope.cn/v1', env: 'MODELSCOPE_SDK_TOKEN',
     signup: 'https://modelscope.cn/my/myaccesstoken',
