@@ -1,15 +1,37 @@
 # orb
 
+One terminal, every model you can access. `orb` discovers local engines and
+direct provider APIs, gives you a searchable mouse-friendly model picker, and
+opens a focused streaming chat—without an Orb account or OAuth flow.
+
 `orb` is a small, direct AI router inspired by OmniRoute. It deliberately has no
 OmniRoute account, OAuth callback, dashboard login, session cookie, telemetry,
 or local API bearer token. It talks directly to local engines and optional
 provider APIs through one clean CLI and an OpenAI-compatible localhost server.
 
-The fastest path is genuinely account-free:
+## Install
+
+Requirements: Node.js 22 or newer. From a GitHub checkout:
 
 ```bash
+git clone <repository-url> orb
+cd orb
 npm install -g .
+orb --version
 orb
+```
+
+There are no runtime npm dependencies. To update an existing checkout:
+
+```bash
+git pull
+npm install -g .
+```
+
+To uninstall:
+
+```bash
+npm uninstall -g orb-route
 ```
 
 If Ollama is running, `orb` discovers its installed models and is ready
@@ -18,9 +40,36 @@ needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
-The v0.10 catalog contains 87 providers, 21 local runtimes, and 573 seeded model
+The v0.11 catalog contains 87 providers, 21 local runtimes, and 573 seeded model
 routes. Public model catalogs are refreshed when possible, so the seed list is
 only a safe offline starting point.
+
+## Interactive UI
+
+Run `orb` and use the interface directly—no command memorization required.
+
+```text
+◆ ORB  interactive model workspace
+
+Select a provider  7/7
+⌕ Type to filter…
+
+ › Orb Auto       AUTO · 1 model
+   Ollama         LOCAL · 1 model
+   Kilo Gateway   KEYLESS · 10 models
+
+↑↓ navigate  Enter select  click an item  Esc cancel
+```
+
+- Use `↑`/`↓`, Page Up/Down, Home/End, and Enter.
+- Click any provider or model in terminals with mouse reporting support.
+- Start typing to filter large provider and model lists immediately.
+- Press Backspace to edit the filter or Esc to clear/cancel.
+- During chat, use `/model`, `/clear`, `/help`, or `/exit`.
+
+The main picker intentionally shows models that are usable now. Run `orb
+providers` to see every installed integration, or add a key with `orb key set
+<provider>` and it will appear automatically.
 
 ## Commands
 
@@ -111,3 +160,15 @@ limits.
 
 The provider-discovery notes and source links live in
 [`docs/FREE_PROVIDERS.md`](docs/FREE_PROVIDERS.md).
+
+## Development
+
+```bash
+npm test
+npm run check
+npm pack --dry-run
+```
+
+The test suite covers provider safety, routing, coding-model ranking, responsive
+tables, keyboard navigation, live filtering, and mouse selection. GitHub Actions
+runs the same checks on pushes and pull requests.

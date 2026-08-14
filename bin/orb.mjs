@@ -6,7 +6,7 @@ import { loadConfig, saveConfig, configPath, providerBaseUrl, providerKey } from
 import { autoRouteCandidates, availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
 import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
-import { c, choose, logo, paint, secretPrompt, table, usage } from '../src/ui.mjs';
+import { c, chatHelp, choose, divider, hyperlink, logo, paint, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
 
 function fail(message, code = 1) {
   stderr.write(`${paint(c.red, 'error')}  ${message}\n`);
@@ -39,7 +39,9 @@ async function readyCatalog(config, refresh = false) {
 }
 
 async function chooseModel(config) {
+  stdout.write(`${paint(c.dim, 'Discovering connected models…')}\r`);
   const catalog = await readyCatalog(config, true);
+  if (stdout.isTTY) stdout.write('\x1b[2K\r');
   const ready = PROVIDERS.map(provider => ({ provider, models: catalog.get(provider.id) || [] }))
     .filter(entry => entry.models.length);
   if (!ready.length) throw new Error('No ready models found. Start Ollama or add a cloud key with `orb key set <provider>`.');
@@ -91,6 +93,9 @@ async function codeCommand(args, config) {
     { value: 'accuracy', label: 'Maximum accuracy', hint: 'strongest reasoning and coding ability' },
     { value: 'cost', label: 'Cost efficiency', hint: 'free and lightweight routes first' },
   ]) : 'accuracy');
+  logo();
+  stdout.write(`${paint(c.dim, `Coding model scout · ${preference === 'accuracy' ? 'maximum accuracy' : 'cost efficiency'}`)}\n`);
+  divider();
   stdout.write(`${paint(c.dim, 'Scanning connected providers…')}\n`);
   const catalog = await readyCatalog(config, true);
   const ranked = rankCodingModels(catalog, preference);
@@ -142,7 +147,7 @@ function signupCommand(args) {
   const provider = PROVIDER_BY_ID.get(args[0]);
   if (!provider) throw new Error(`Unknown provider: ${args[0] || '(missing)'}`);
   if (!provider.signup) throw new Error(`${provider.name} has no signup page.`);
-  stdout.write(`${paint(c.bold, provider.name)}\n${provider.signup}\n`);
+  stdout.write(`${paint(c.bold, provider.name)}\n${hyperlink('Open signup or API-key page', provider.signup)}\n`);
   if (provider.env) stdout.write(`${paint(c.dim, `then run: orb key set ${provider.id}  ·  env: ${provider.env}`)}\n`);
 }
 
@@ -233,14 +238,20 @@ async function chatCommand(args, config) {
   if (!loadConfig().selected) saveConfig(config);
   const rl = interactive ? createInterface({ input: stdin, output: stdout }) : null;
   const messages = [];
-  logo();
-  stdout.write(`${paint(c.dim, config.selected)}${interactive ? paint(c.dim, ' · /model /clear /exit') : ''}\n\n`);
+  sessionHeader(config.selected);
   try {
     let next = initial;
     while (true) {
-      if (interactive) next = (await rl.question(`${paint(c.cyan, 'you')}  `)).trim();
+      if (interactive) next = (await rl.question(`${paint(c.cyan, '❯')} `)).trim();
       if (!next || next === '/exit' || next === '/quit') break;
-      if (next === '/clear') { messages.length = 0; stdout.write(`${paint(c.dim, 'conversation cleared')}\n`); continue; }
+      if (next === '/help') { chatHelp(); continue; }
+      if (next === '/clear') {
+        messages.length = 0;
+        if (stdout.isTTY) stdout.write('\x1b[2J\x1b[H');
+        sessionHeader(config.selected);
+        stdout.write(`${paint(c.green, '✓')} conversation cleared\n\n`);
+        continue;
+      }
       if (next === '/model') {
         rl.close();
         config.selected = await chooseModel(config);
@@ -249,11 +260,17 @@ async function chatCommand(args, config) {
         return chatCommand([], config);
       }
       messages.push({ role: 'user', content: next });
-      stdout.write(`${paint(c.blue, 'orb')}  `);
+      stdout.write(`\n${paint(c.blue, '◆')} `);
       let answer = '';
-      await streamCompletion({ route: config.selected, messages, config }, text => { answer += text; stdout.write(text); });
-      stdout.write('\n\n');
-      messages.push({ role: 'assistant', content: answer });
+      try {
+        await streamCompletion({ route: config.selected, messages, config }, text => { answer += text; stdout.write(text); });
+        stdout.write('\n\n');
+        messages.push({ role: 'assistant', content: answer });
+      } catch (error) {
+        messages.pop();
+        stdout.write(`\n${paint(c.red, '✕')} ${error.message}\n\n`);
+        if (!interactive) throw error;
+      }
       if (!interactive) break;
     }
   } finally { rl?.close(); }
@@ -281,7 +298,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.10.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.11.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());
