@@ -1424,6 +1424,29 @@ export const PROVIDERS = Object.freeze([
     free: 'Unified pay-as-you-go gateway; model availability and regional routes can change.',
     models: ['gpt-5.2-codex', 'claude-opus-4-7', 'gemini-2.5-flash', 'gpt-4o-mini'],
   },
+  {
+    id: 'openshift-maas', name: 'OpenShift AI Models-as-a-Service', badge: 'SELF-HOSTED', kind: 'local', keyless: false,
+    baseUrl: '', baseEnv: 'OPENSHIFT_MAAS_URL', requiresBaseUrl: true, env: 'OPENSHIFT_MAAS_API_KEY',
+    signup: 'https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.4/html-single/govern_llm_access_with_models-as-a-service/index',
+    free: 'Runs in the user’s OpenShift AI cluster; provide the model-specific /llm/<model-name>/v1 URL and its MaaS API key.',
+    models: ['model-name'],
+  },
+  {
+    id: 'openshift-ogx', name: 'OpenShift AI OGX', badge: 'SELF-HOSTED', kind: 'local', keyless: true,
+    baseUrl: '', baseEnv: 'OPENSHIFT_OGX_URL', requiresBaseUrl: true,
+    env: 'OPENSHIFT_OGX_API_KEY', optionalKey: true,
+    signup: 'https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.5/html/working_with_ogx/overview-of-ogx_rag',
+    free: 'Runs in the user’s OpenShift AI cluster; provide the OGX service URL ending in /v1 and a key if authentication is enabled.',
+    models: ['model-name'],
+  },
+  {
+    id: 'openshift-llmd', name: 'OpenShift AI llm-d', badge: 'DISTRIBUTED', kind: 'local', keyless: true,
+    baseUrl: '', baseEnv: 'OPENSHIFT_LLMD_URL', requiresBaseUrl: true,
+    env: 'OPENSHIFT_LLMD_TOKEN', optionalKey: true,
+    signup: 'https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.5/html/deploy_models_using_distributed_inference_with_llm-d/',
+    free: 'Connects to an llm-d LLMInferenceService /v1 endpoint; a bearer token is required when cluster authentication is enabled.',
+    models: ['RedHatAI/Qwen3-8B-FP8-dynamic'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
