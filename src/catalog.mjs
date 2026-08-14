@@ -1400,6 +1400,30 @@ export const PROVIDERS = Object.freeze([
     free: 'ModelArk usage is metered through the BytePlus account; promotional offers may vary.',
     models: ['seed-2-0-lite-260228'],
   },
+  {
+    id: 'lamini', name: 'Lamini Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.lamini.ai/inf', env: 'LAMINI_API_KEY',
+    signup: 'https://app.lamini.ai/account',
+    free: 'Hosted and third-party inference usage depends on the credits and plan attached to the account.',
+    models: ['meta-llama/Llama-3.2-3B-Instruct', 'gpt-4o-mini'],
+  },
+  {
+    id: 'apertis', name: 'Apertis', badge: 'CODING PLANS', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.apertis.ai/v1', env: 'APERTIS_API_KEY',
+    signup: 'https://api.apertis.ai',
+    free: 'Offers subscription coding plans and pay-as-you-go access; available models depend on the key type.',
+    models: [
+      'claude-opus-4-8', 'claude-sonnet-4-6', 'claude-haiku-4-5',
+      'gpt-5.5', 'gpt-5.4-mini',
+    ],
+  },
+  {
+    id: 'aihubmix', name: 'AIHubMix', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://aihubmix.com/v1', env: 'AIHUBMIX_API_KEY',
+    signup: 'https://aihubmix.com',
+    free: 'Unified pay-as-you-go gateway; model availability and regional routes can change.',
+    models: ['gpt-5.2-codex', 'claude-opus-4-7', 'gemini-2.5-flash', 'gpt-4o-mini'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
