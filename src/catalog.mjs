@@ -1238,6 +1238,41 @@ export const PROVIDERS = Object.freeze([
     free: 'The open-source gateway runs locally; connected upstream models may still incur their own charges.',
     models: ['gpt-oss', 'gpt-4o-mini', 'claude-3-opus'],
   },
+  {
+    id: 'inference-net', name: 'Inference.net', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.inference.net/v1', env: 'INFERENCE_NET_API_KEY',
+    signup: 'https://inference.net/dashboard/api-keys',
+    free: 'Account creation is free; hosted open models and custom deployments are billed to the workspace.',
+    models: [
+      'google/gemma-3-27b-instruct/bf-16',
+      'meta-llama/llama-3.2-1b-instruct/fp-16',
+      'inference-net/schematron-v2-small',
+    ],
+  },
+  {
+    id: 'koyeb-inference', name: 'Koyeb Inference', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: true,
+    baseUrl: '', baseEnv: 'KOYEB_INFERENCE_URL', requiresBaseUrl: true,
+    env: 'KOYEB_INFERENCE_API_KEY', optionalKey: true,
+    signup: 'https://app.koyeb.com',
+    free: 'Point Orb at the /v1 URL of a Koyeb-hosted vLLM service; Koyeb compute charges apply.',
+    models: ['koyeb/Meta-Llama-3.1-8B-Instruct'],
+  },
+  {
+    id: 'tensorrt-llm', name: 'TensorRT-LLM Serve', badge: 'LOCAL GPU', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', baseEnv: 'TENSORRT_LLM_URL',
+    env: 'TENSORRT_LLM_API_KEY', optionalKey: true,
+    signup: 'https://github.com/NVIDIA/TensorRT-LLM',
+    free: 'Runs locally on NVIDIA GPUs; Orb discovers the model loaded by trtllm-serve.',
+    models: ['openai/gpt-oss-120b', 'TinyLlama-1.1B-Chat-v1.0'],
+  },
+  {
+    id: 'mistralrs', name: 'mistral.rs', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:1234/v1', baseEnv: 'MISTRALRS_URL',
+    env: 'MISTRALRS_API_KEY', optionalKey: true,
+    signup: 'https://github.com/EricLBuehler/mistral.rs',
+    free: 'Runs locally across CUDA, Metal, CPU, and other accelerators with no service fee.',
+    models: ['default', 'Qwen/Qwen3-4B'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
