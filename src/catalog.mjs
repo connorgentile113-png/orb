@@ -1548,6 +1548,22 @@ export const PROVIDERS = Object.freeze([
     free: 'Provide the deployment URL ending in /v1; dedicated deployment and adapter usage is billed by Predibase.',
     models: ['meta-llama/Llama-3.1-8B-Instruct', 'alignment-handbook/zephyr-7b-dpo-lora', 'deployment-model'],
   },
+  {
+    id: 'nvidia-dynamo', name: 'NVIDIA Dynamo Frontend', badge: 'LOCAL GPU', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', baseEnv: 'NVIDIA_DYNAMO_URL',
+    env: 'NVIDIA_DYNAMO_API_KEY', optionalKey: true,
+    signup: 'https://docs.nvidia.com/dynamo/latest/components/frontend',
+    free: 'Runs locally or in the user’s Kubernetes cluster; GPU infrastructure and model licensing are user supplied.',
+    models: ['Qwen/Qwen3.5-4B', 'thinkingmachines/Inkling-NVFP4'],
+  },
+  {
+    id: 'lmdeploy', name: 'LMDeploy API Server', badge: 'LOCAL GPU', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:23333/v1', baseEnv: 'LMDEPLOY_URL',
+    env: 'LMDEPLOY_API_KEY', optionalKey: true,
+    signup: 'https://lmdeploy.readthedocs.io/en/latest/llm/api_server.html',
+    free: 'Runs models locally through TurboMind or PyTorch engines with no per-token service fee.',
+    models: ['Qwen/Qwen3-Coder-30B-A3B-Instruct', 'internlm/internlm2_5-7b-chat'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
