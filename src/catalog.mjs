@@ -911,7 +911,7 @@ export const PROVIDERS = Object.freeze([
     baseUrl: 'https://api.publicai.co/v1', env: 'PUBLICAI_API_KEY',
     signup: 'https://platform.publicai.co',
     autoModel: 'swiss-ai/apertus-70b-instruct', autoPriority: 20,
-    headers: { 'user-agent': 'orb-ai/0.13.0' },
+    headers: { 'user-agent': 'orb-ai/0.13.1' },
     free: 'Public-interest inference tier with a provider-published request limit.',
     models: ['swiss-ai/apertus-70b-instruct', 'swiss-ai/Apertus-8B-Instruct-2509', 'aisingapore/Qwen-SEA-LION-v4-32B-IT', 'aisingapore/Gemma-SEA-LION-v4-27B-IT', 'allenai/Olmo-3-32B-Think', 'allenai/Olmo-3-7B-Instruct', 'utter-project/EuroLLM-22B-Instruct-2512'],
   },

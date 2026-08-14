@@ -1,6 +1,6 @@
 {
   "name": "orb-ai",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Zero-account local AI router with optional free-tier cloud providers",
   "homepage": "https://github.com/connorgentile113-png/orb#readme",
   "repository": {
