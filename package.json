@@ -1,0 +1,24 @@
+{
+  "name": "orb-route",
+  "version": "0.1.0",
+  "description": "Zero-account local AI router with optional free-tier cloud providers",
+  "type": "module",
+  "bin": {
+    "orb": "bin/orb.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check bin/orb.mjs && node --check src/catalog.mjs && node --check src/config.mjs && node --check src/client.mjs && node --check src/server.mjs && node --check src/ui.mjs"
+  },
+  "keywords": [
+    "ai",
+    "llm",
+    "router",
+    "openai-compatible",
+    "ollama"
+  ],
+  "license": "MIT"
+}
