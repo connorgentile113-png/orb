@@ -1,11 +1,14 @@
 import { PROVIDERS, routeName } from './catalog.mjs';
 
 const QUALITY_RULES = Object.freeze([
+  { pattern: /gpt[-_.]?5[._-]?6[-_.]?sol|claude.*opus.*4[._-]?8/i, score: 100, reason: 'frontier agentic coding model' },
+  { pattern: /gpt[-_.]?5[._-]?6[-_.]?terra/i, score: 98, reason: 'frontier coding model' },
+  { pattern: /claude.*sonnet.*4[._-]?6/i, score: 96, reason: 'top-tier agentic coding model' },
+  { pattern: /gpt[-_.]?5[._-]?6[-_.]?luna/i, score: 94, reason: 'fast frontier coding model' },
   { pattern: /claude.*(?:fable|mythos)[-_. ]5(?:\b|[-_.])/i, score: 100, reason: 'frontier agentic model' },
   { pattern: /claude.*opus[-_. ]5(?:\b|[-_.])|gpt[-_.]?5[._-]?(?:4|5|6).*codex/i, score: 98, reason: 'frontier coding model' },
   { pattern: /gpt[-_.]?5[._-]?3.*codex|claude.*sonnet[-_. ]5(?:\b|[-_.])/i, score: 96, reason: 'top-tier coding model' },
   { pattern: /gpt[-_.]?5(?:[._-]?4)?(?:\b|[-_])|claude.*opus|(?:^|[/_-])o3(?:\b|[-_])/i, score: 93, reason: 'flagship reasoning model' },
-  { pattern: /claude.*sonnet.*4[._-]?6/i, score: 92, reason: 'strong agentic coding model' },
   { pattern: /claude.*sonnet.*4[._-]?5|deepseek.*v4.*pro/i, score: 90, reason: 'strong coding and reasoning model' },
   { pattern: /kimi.*k2[._-]?7.*code|qwen3.*coder.*(?:480|next)|gpt[-_.]?oss[-_.]?120b/i, score: 88, reason: 'large coding-capable model' },
   { pattern: /laguna|qwen.*coder|codex|codestral|devstral|mistral.*code|north.*code/i, score: 85, reason: 'coding-specialized model' },

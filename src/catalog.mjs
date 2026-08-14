@@ -725,6 +725,20 @@ export const PROVIDERS = Object.freeze([
     free: 'ModelArts MaaS usage is metered through Huawei Cloud.', models: ['DeepSeek-V31'],
   },
   {
+    id: 'ionos', name: 'IONOS AI Model Hub', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://openai.inference.de-txl.ionos.com/v1', env: 'IONOS_AI_MODEL_HUB_TOKEN',
+    signup: 'https://dcd.ionos.com',
+    free: 'Model Hub usage is token-metered through IONOS Cloud.',
+    models: ['openai/gpt-oss-120b', 'meta-llama/Meta-Llama-3.1-8B-Instruct'],
+  },
+  {
+    id: 'stackit', name: 'STACKIT AI Model Serving', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.openai-compat.model-serving.eu01.onstackit.cloud/v1', env: 'STACKIT_MODEL_SERVING_TOKEN',
+    signup: 'https://portal.stackit.cloud',
+    free: 'Shared model usage is metered through the STACKIT project.',
+    models: ['openai/gpt-oss-120b', 'cortecs/Llama-3.3-70B-Instruct-FP8-Dynamic'],
+  },
+  {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
     baseUrl: 'https://api-inference.modelscope.cn/v1', env: 'MODELSCOPE_SDK_TOKEN',
     signup: 'https://modelscope.cn/my/myaccesstoken',

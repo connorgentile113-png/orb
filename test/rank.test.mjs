@@ -32,3 +32,19 @@ test('cost ranking favors a capable explicit free coding route', () => {
 test('coding ranking rejects unknown preferences', () => {
   assert.throws(() => rankCodingModels(catalog, 'fast', providers), /accuracy or cost/);
 });
+
+test('accuracy ranking recognizes current frontier coding model families', () => {
+  const providers = [
+    { id: 'digitalocean', name: 'DigitalOcean', kind: 'cloud', badge: 'METERED' },
+    { id: 'bedrock', name: 'Bedrock', kind: 'cloud', badge: 'METERED' },
+  ];
+  const catalog = new Map([
+    ['digitalocean', ['openai-gpt-5.6-sol', 'openai-gpt-5.6-luna']],
+    ['bedrock', ['us.anthropic.claude-opus-4-8', 'us.anthropic.claude-sonnet-4-6']],
+  ]);
+  const ranked = rankCodingModels(catalog, 'accuracy', providers);
+  assert.deepEqual(ranked.slice(0, 2).map(item => item.model), [
+    'openai-gpt-5.6-sol', 'us.anthropic.claude-opus-4-8',
+  ]);
+  assert.equal(ranked.find(item => item.model.endsWith('sonnet-4-6')).quality, 96);
+});
