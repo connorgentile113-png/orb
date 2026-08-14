@@ -120,6 +120,18 @@ export const PROVIDERS = Object.freeze([
     free: 'Discovers models from the local OpenAI-compatible Transformers Serve CLI.', models: [],
   },
   {
+    id: 'llamafile', name: 'llamafile', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', env: null,
+    signup: 'https://github.com/mozilla-ai/llamafile',
+    free: 'Discovers models from a local llamafile server on its default port.', models: [],
+  },
+  {
+    id: 'docker-model-runner', name: 'Docker Model Runner', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:12434/engines/v1', env: null,
+    signup: 'https://docs.docker.com/ai/model-runner/',
+    free: 'Uses Docker Model Runner’s keyless local OpenAI-compatible API.', models: [],
+  },
+  {
     id: 'pollinations', name: 'Pollinations', badge: 'KEYLESS', kind: 'community', keyless: true,
     baseUrl: 'https://text.pollinations.ai/openai', env: 'POLLINATIONS_API_KEY', optionalKey: true,
     signup: 'https://enter.pollinations.ai',
@@ -308,6 +320,13 @@ export const PROVIDERS = Object.freeze([
     models: ['kimi-k2-0905-preview', 'moonshot-v1-8k', 'moonshot-v1-128k'],
   },
   {
+    id: 'deepseek', name: 'DeepSeek', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.deepseek.com/v1', env: 'DEEPSEEK_API_KEY',
+    signup: 'https://platform.deepseek.com/api_keys',
+    free: 'Current direct API usage is metered; granted account balance may apply.',
+    models: ['deepseek-v4-flash', 'deepseek-v4-pro'],
+  },
+  {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
     baseUrl: 'https://api-inference.modelscope.cn/v1', env: 'MODELSCOPE_SDK_TOKEN',
     signup: 'https://modelscope.cn/my/myaccesstoken',
@@ -480,7 +499,7 @@ export const PROVIDERS = Object.freeze([
     baseUrl: 'https://api.publicai.co/v1', env: 'PUBLICAI_API_KEY',
     signup: 'https://platform.publicai.co',
     autoModel: 'swiss-ai/apertus-70b-instruct', autoPriority: 20,
-    headers: { 'user-agent': 'orb-route/0.8.0' },
+    headers: { 'user-agent': 'orb-route/0.9.0' },
     free: 'Public-interest inference tier with a provider-published request limit.',
     models: ['swiss-ai/apertus-70b-instruct', 'swiss-ai/Apertus-8B-Instruct-2509', 'aisingapore/Qwen-SEA-LION-v4-32B-IT', 'aisingapore/Gemma-SEA-LION-v4-27B-IT', 'allenai/Olmo-3-32B-Think', 'allenai/Olmo-3-7B-Instruct', 'utter-project/EuroLLM-22B-Instruct-2512'],
   },

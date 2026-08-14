@@ -47,6 +47,8 @@ bypassing a provider’s limits.
 | MLC LLM | `mlc-llm` | local, keyless | `http://127.0.0.1:8000/v1` |
 | llama-cpp-python | `llama-cpp-python` | local, optional key | `http://127.0.0.1:8000/v1` |
 | Transformers Serve | `transformers-serve` | local, keyless | `http://127.0.0.1:8000/v1` |
+| llamafile | `llamafile` | local, keyless | `http://127.0.0.1:8080/v1` |
+| Docker Model Runner | `docker-model-runner` | local, keyless | `http://127.0.0.1:12434/engines/v1` |
 | Pollinations legacy community endpoint | `pollinations` | keyless, rate-limited | `https://text.pollinations.ai/openai` |
 | Google Gemini | `gemini` | free tier | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | GroqCloud | `groq` | free tier | `https://api.groq.com/openai/v1` |
@@ -61,6 +63,7 @@ bypassing a provider’s limits.
 | Mistral | `mistral` | experiment tier | `https://api.mistral.ai/v1` |
 | Alibaba Model Studio | `dashscope` | model-dependent free quota | regional endpoint |
 | Moonshot AI | `moonshot` | model-dependent free quota | `https://api.moonshot.ai/v1` |
+| DeepSeek | `deepseek` | metered; granted balance may apply | `https://api.deepseek.com/v1` |
 | OpenRouter | `openrouter` | models ending in `:free` | `https://openrouter.ai/api/v1` |
 | NVIDIA NIM | `nvidia` | evaluation allowance | `https://integrate.api.nvidia.com/v1` |
 | Chutes | `chutes` | metered optional provider | `https://llm.chutes.ai/v1` |
@@ -183,6 +186,9 @@ access requires payment verification.
 - [MLC LLM REST API](https://llm.mlc.ai/docs/deploy/rest.html)
 - [llama-cpp-python server](https://llama-cpp-python.readthedocs.io/en/stable/server/)
 - [Transformers Serve](https://huggingface.co/docs/transformers/serve-cli/serving)
+- [llamafile server mode](https://docs.mozilla.ai/llamafile/using-llamafile/running_llamafile)
+- [Docker Model Runner OpenAI-compatible API](https://docs.docker.com/ai/model-runner/api-reference/)
+- [DeepSeek models and current metered pricing](https://api-docs.deepseek.com/quick_start/pricing/)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves
