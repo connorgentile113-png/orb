@@ -1210,6 +1210,34 @@ export const PROVIDERS = Object.freeze([
     free: 'Account creation is free, but current chat pricing is pay-as-you-go.',
     models: ['reka-flash', 'reka-edge', 'reka-edge-2603'],
   },
+  {
+    id: 'lighton', name: 'LightOn Paradigm', badge: 'ENTERPRISE', kind: 'cloud', keyless: false,
+    baseUrl: 'https://paradigm.lighton.ai/api/v3', env: 'LIGHTON_API_KEY',
+    signup: 'https://paradigm.lighton.ai',
+    free: 'Paradigm access is provisioned by an organization; usage and model availability depend on its plan.',
+    models: ['alfred-4.2', 'alfred-ft5'],
+  },
+  {
+    id: 'writer', name: 'Writer AI Studio', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.writer.com/v1', env: 'WRITER_API_KEY',
+    signup: 'https://app.writer.com/aistudio',
+    free: 'API usage is metered; availability is controlled by the user’s Writer AI Studio workspace.',
+    models: ['palmyra-x5', 'palmyra-x4'],
+  },
+  {
+    id: 'langdb', name: 'LangDB AI Gateway', badge: 'GATEWAY', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'LANGDB_BASE_URL', requiresBaseUrl: true, env: 'LANGDB_API_KEY',
+    signup: 'https://app.langdb.ai',
+    free: 'Use the project-specific URL shown by LangDB; downstream model charges and workspace limits apply.',
+    models: ['anthropic/claude-sonnet-4', 'openai/gpt-4.1', 'openai/gpt-4o-mini'],
+  },
+  {
+    id: 'langdb-local', name: 'LangDB Self-Hosted', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', baseEnv: 'LANGDB_LOCAL_URL', env: 'LANGDB_LOCAL_API_KEY', optionalKey: true,
+    signup: 'https://github.com/langdb/ai-gateway',
+    free: 'The open-source gateway runs locally; connected upstream models may still incur their own charges.',
+    models: ['gpt-oss', 'gpt-4o-mini', 'claude-3-opus'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
