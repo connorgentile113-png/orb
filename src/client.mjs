@@ -18,7 +18,11 @@ function headersFor(provider, key) {
   if (key && provider.protocol === 'anthropic') {
     headers['x-api-key'] = key;
     headers['anthropic-version'] = '2023-06-01';
-  } else if (key) headers.authorization = `Bearer ${key}`;
+  } else if (key) {
+    const name = provider.authHeader || 'authorization';
+    const prefix = provider.authPrefix === undefined ? 'Bearer ' : provider.authPrefix;
+    headers[name] = `${prefix}${key}`;
+  }
   return headers;
 }
 

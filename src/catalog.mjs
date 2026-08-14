@@ -1513,6 +1513,22 @@ export const PROVIDERS = Object.freeze([
     free: 'Connects to an LLM blueprint deployment URL; DataRobot platform and underlying model charges apply.',
     models: ['deployment'],
   },
+  {
+    id: 'traefik-ai', name: 'Traefik Hub AI Gateway', badge: 'GATEWAY', kind: 'local', keyless: true,
+    baseUrl: '', baseEnv: 'TRAEFIK_AI_GATEWAY_URL', requiresBaseUrl: true,
+    env: 'TRAEFIK_AI_GATEWAY_KEY', optionalKey: true,
+    signup: 'https://doc.traefik.io/traefik-hub/ai-gateway/overview',
+    free: 'Provide the gateway route ending in /v1; Traefik Hub licensing and upstream model pricing apply.',
+    models: ['openai/gpt-5.2-codex', 'anthropic/claude-sonnet-4-6', 'gemini/gemini-3-flash-preview'],
+  },
+  {
+    id: 'wso2-ai', name: 'WSO2 AI Gateway', badge: 'GATEWAY', kind: 'local', keyless: false,
+    baseUrl: '', baseEnv: 'WSO2_AI_GATEWAY_URL', requiresBaseUrl: true,
+    env: 'WSO2_AI_GATEWAY_API_KEY', authHeader: 'ApiKey', authPrefix: '',
+    signup: 'https://apim.docs.wso2.com/en/latest/ai-gateway/overview/',
+    free: 'Provide the exposed OpenAI-format API URL and its WSO2 application key; upstream model charges apply.',
+    models: ['gpt-5.4', 'claude-sonnet-4-6', 'gemini-2.5-flash'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));

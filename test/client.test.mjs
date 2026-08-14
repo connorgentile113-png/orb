@@ -66,6 +66,23 @@ test('provider safety headers are forwarded to free-model gateways', async t => 
   assert.equal(await completionText({ route: 'bazaarlink/auto:free', messages: [], config }), 'safe free route');
 });
 
+test('provider-specific authentication headers are supported', async t => {
+  const upstream = http.createServer((request, response) => {
+    assert.equal(request.url, '/v1/models');
+    assert.equal(request.headers.apikey, 'wso2-test-key');
+    assert.equal(request.headers.authorization, undefined);
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({ data: [{ id: 'gpt-5.4' }] }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { 'wso2-ai': 'wso2-test-key' },
+    providers: { 'wso2-ai': { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.deepEqual(await discoverModels(PROVIDER_BY_ID.get('wso2-ai'), config), ['gpt-5.4']);
+});
+
 test('adapts Ollama Cloud native responses to OpenAI chat responses', async t => {
   const upstream = http.createServer(async (request, response) => {
     assert.equal(request.url, '/api/chat');
