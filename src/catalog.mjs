@@ -1717,6 +1717,27 @@ export const PROVIDERS = Object.freeze([
     free: 'Access and quota depend on the SenseCore service activation; supply a current bearer API token.',
     models: ['SenseChat-Character', 'SenseChat-Character-Pro', 'SenseChat-Character-Turbo'],
   },
+  {
+    id: 'shuttleai', name: 'ShuttleAI', badge: 'FREE TIER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.shuttleai.com/v1', env: 'SHUTTLEAI_API_KEY', publicCatalog: true,
+    signup: 'https://shuttleai.com',
+    free: 'Free accounts include open-model routes at 2 requests per minute; paid plans unlock frontier models.',
+    models: [
+      'shuttleai/auto', 'gpt-oss-120b', 'gpt-oss-20b',
+      'gpt-5.2', 'claude-opus-4.6', 'claude-sonnet-4.6',
+    ],
+  },
+  {
+    id: 'awanllm', name: 'AwanLLM', badge: 'DAILY FREE', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.awanllm.com/v1', env: 'AWANLLM_API_KEY',
+    signup: 'https://www.awanllm.com',
+    free: 'The Lite plan includes daily request quotas that vary by model size.',
+    models: [
+      'Meta-Llama-3.1-8B-Instruct', 'Meta-Llama-3-8B-Instruct',
+      'Awanllm-Llama-3-8B-Dolfin', 'Awanllm-Llama-3-8B-Cumulus',
+      'Meta-Llama-3.1-70B-Instruct', 'Meta-Llama-3-70B-Instruct',
+    ],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
