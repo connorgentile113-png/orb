@@ -72,7 +72,7 @@ const PROVIDERS_WITH_AUTO_MODELS = [...PROVIDER_BY_ID.values()]
 
 export function modelIdsFromResponse(provider, body) {
   if (provider.discover === false) return [...provider.models];
-  let items = body.data || body.models || [];
+  let items = body.data || body.models || body.text || [];
   if (provider.modelPolicy === 'free-suffix') {
     items = items.filter(item => {
       const id = typeof item === 'string' ? item : item.id || item.name || '';
@@ -92,15 +92,26 @@ export function modelIdsFromResponse(provider, body) {
       return input !== undefined && output !== undefined && Number(input) === 0 && Number(output) === 0;
     });
   }
+  if (provider.modelPolicy === 'basic-free') {
+    items = items.filter(item => {
+      if (typeof item !== 'object' || item.min_plan !== 'BASIC') return false;
+      const input = item.pricing?.input ?? item.pricing?.prompt;
+      const output = item.pricing?.output ?? item.pricing?.completion;
+      return input !== undefined && output !== undefined && Number(input) === 0 && Number(output) === 0;
+    });
+  }
   if (provider.chatOnly) {
     items = items.filter(item => {
       if (typeof item === 'string') return true;
       const id = item.id || item.name || '';
+      const endpoints = item.supported_endpoints;
+      const endpointSupportsChat = !Array.isArray(endpoints) || endpoints.includes('chat.completions');
       const supportsCompletion = item.max_completion_tokens === undefined || item.max_completion_tokens > 0;
       const chatType = item.model_type === undefined || item.model_type === 'chat';
       const supportsChat = item.supports_chat === undefined || item.supports_chat === true;
-      const textOutput = !Array.isArray(item.output_modalities) || item.output_modalities.includes('text');
-      return supportsCompletion && chatType && supportsChat && textOutput
+      const outputModalities = item.output_modalities || item.architecture?.output_modalities;
+      const textOutput = !Array.isArray(outputModalities) || outputModalities.includes('text');
+      return endpointSupportsChat && supportsCompletion && chatType && supportsChat && textOutput
         && !/guard|embed|rerank|whisper|stable-diffusion|image-|audio|voice|suno|kling|veo|banana/i.test(id);
     });
   }

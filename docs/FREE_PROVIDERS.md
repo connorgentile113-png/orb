@@ -76,6 +76,16 @@ bypassing a provider’s limits.
 | Public AI Gateway | `publicai` | public-interest free tier | `https://api.publicai.co/v1` |
 | Morph | `morph` | 200 free requests/month | `https://api.morphllm.com/v1` |
 | Ant Ling | `ant-ling` | 500K tokens/day | `https://api.ant-ling.com/v1` |
+| AnyAPI AI | `anyapi` | 100K anyTokens/day on explicit free models | `https://api.anyapi.ai/v1` |
+| FastRouter | `fastrouter` | zero-priced `:free` routes | `https://api.fastrouter.ai/api/v1` |
+| Routeway | `routeway` | 5 RPM / 200 RPD `:free` routes | `https://api.routeway.ai/v1` |
+| NagaAI | `naga` | zero-priced `:free` chat routes | `https://api.naga.ac/v1` |
+| Poixe AI | `poixe` | daily-reset `:free` chat quotas | `https://api.poixe.com/v1` |
+| MegaNova | `meganova` | tier-1 models with daily limits | `https://inference.meganova.ai/v1` |
+| Zylo AI | `zylo` | zero-priced Basic-plan models | `https://api.zyloai.net/v1` |
+| VoidAI | `voidai` | 125K credits/day | `https://api.voidai.app/v1` |
+| Poolside | `poolside` | limited-time Laguna preview | `https://inference.poolside.ai/v1` |
+| Mixlayer | `mixlayer` | explicit free Qwen route | `https://models.mixlayer.ai/v1` |
 | LongCat | `longcat` | one-time evaluation grant | `https://api.longcat.chat/openai/v1` |
 | Reka | `reka` | metered; free account only | `https://api.reka.ai/v1` |
 
@@ -109,6 +119,20 @@ access requires payment verification.
 - [Public AI API setup and rate limits](https://platform.publicai.co/docs)
 - [Morph monthly allowance and model pricing](https://www.morphllm.com/pricing)
 - [Ant Ling recurring allowance](https://developer.ant-ling.com/en/docs/models/price/)
+- [AnyAPI quickstart](https://docs.anyapi.ai/get-started/quick-start),
+  [pricing](https://anyapi.ai/pricing), and [terms](https://anyapi.ai/terms-of-service)
+- [FastRouter public model API](https://docs.fastrouter.ai/api-reference/models)
+- [Routeway free-model rules](https://docs.routeway.ai/getting-started/models)
+  and [rate limits](https://docs.routeway.ai/getting-started/rate-limits)
+- [NagaAI API reference](https://docs.naga.ac/api-reference/overview)
+- [Poixe free-model limits](https://poixe.com/products/free) and
+  [model suffix rules](https://docs.poixe.com/cn/api-reference/introduction/model-naming)
+- [MegaNova free model list](https://docs.meganova.ai/inference-models/model-list)
+  and [OpenAI-compatible endpoint](https://docs.meganova.ai/)
+- [Zylo Basic plan and endpoint](https://zyloai.net/)
+- [VoidAI free plan](https://voidai.app/pricing) and
+  [quickstart](https://docs.voidai.app/quickstart)
+- [Poolside model preview](https://poolside.ai/models)
 - [LongCat API overview](https://longcat.chat/platform/docs/APIDocs.html)
 - [Reka API quickstart](https://docs.reka.ai/quickstart) and
   [current metered pricing](https://docs.reka.ai/pricing)
