@@ -1529,6 +1529,17 @@ export const PROVIDERS = Object.freeze([
     free: 'Provide the exposed OpenAI-format API URL and its WSO2 application key; upstream model charges apply.',
     models: ['gpt-5.4', 'claude-sonnet-4-6', 'gemini-2.5-flash'],
   },
+  {
+    id: 'cloudflare-gateway', name: 'Cloudflare AI Gateway REST API', badge: 'UNIFIED BILLING', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'CLOUDFLARE_AI_GATEWAY_URL', requiresBaseUrl: true, env: 'CLOUDFLARE_AI_GATEWAY_TOKEN',
+    signup: 'https://developers.cloudflare.com/ai-gateway/usage/rest-api/',
+    free: 'Use the account-specific URL ending in /ai/v1 and a Cloudflare API token; model usage follows Unified Billing.',
+    models: [
+      'openai/gpt-5.2-codex', 'openai/gpt-4.1', 'anthropic/claude-sonnet-4-5',
+      'google-ai-studio/gemini-2.5-flash', 'xai/grok-4',
+      '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+    ],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
