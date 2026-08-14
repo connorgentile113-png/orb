@@ -1483,6 +1483,36 @@ export const PROVIDERS = Object.freeze([
     free: 'Provide the configured gateway base URL ending in /v1; gateway and upstream model billing apply.',
     models: ['gpt-4o-mini'],
   },
+  {
+    id: 'tensorzero', name: 'TensorZero Gateway', badge: 'LOCAL GATEWAY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:3000/openai/v1', baseEnv: 'TENSORZERO_URL',
+    env: 'TENSORZERO_API_KEY', optionalKey: true,
+    signup: 'https://www.tensorzero.com/docs/gateway/clients/',
+    free: 'The open-source gateway runs locally; credentials and charges belong to its configured upstream providers.',
+    models: ['tensorzero::model_name::openai::gpt-5-mini', 'tensorzero::model_name::anthropic::claude-sonnet-4-20250514'],
+  },
+  {
+    id: 'bentoml-local', name: 'BentoML Local Service', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:3000/v1', baseEnv: 'BENTOML_LOCAL_URL',
+    env: 'BENTOML_LOCAL_API_KEY', optionalKey: true,
+    signup: 'https://docs.bentoml.com/en/latest/examples/vllm.html',
+    free: 'Runs a BentoML OpenAI-compatible service locally or on user-controlled infrastructure.',
+    models: ['meta-llama/Meta-Llama-3.1-8B-Instruct', 'deepseek-ai/DeepSeek-R1-Distill-Llama-70B'],
+  },
+  {
+    id: 'datarobot-gateway', name: 'DataRobot LLM Gateway', badge: 'ENTERPRISE', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'DATAROBOT_LLM_GATEWAY_URL', requiresBaseUrl: true, env: 'DATAROBOT_API_TOKEN',
+    signup: 'https://docs.datarobot.com/en/docs/gen-ai/genai-code/dr-llm-gateway.html',
+    free: 'Requires an enabled DataRobot LLM Gateway plan; provide the organization endpoint ending in /api/v2/genai/llmgw.',
+    models: ['azure/gpt-4o', 'anthropic/claude-sonnet-4'],
+  },
+  {
+    id: 'datarobot-deployment', name: 'DataRobot LLM Deployment', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'DATAROBOT_DEPLOYMENT_URL', requiresBaseUrl: true, env: 'DATAROBOT_DEPLOYMENT_API_TOKEN',
+    signup: 'https://docs.datarobot.com/latest/en/docs/gen-ai/genai-code/genai-chat-completion-api.html',
+    free: 'Connects to an LLM blueprint deployment URL; DataRobot platform and underlying model charges apply.',
+    models: ['deployment'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
