@@ -1273,6 +1273,36 @@ export const PROVIDERS = Object.freeze([
     free: 'Runs locally across CUDA, Metal, CPU, and other accelerators with no service fee.',
     models: ['default', 'Qwen/Qwen3-4B'],
   },
+  {
+    id: 'gpustack', name: 'GPUStack', badge: 'SELF-HOSTED', kind: 'local', keyless: false,
+    baseUrl: '', baseEnv: 'GPUSTACK_URL', requiresBaseUrl: true, env: 'GPUSTACK_API_KEY',
+    signup: 'https://github.com/gpustack/gpustack',
+    free: 'The open-source control plane is self-hosted; users supply the /v1 endpoint and an API key.',
+    models: ['qwen3-0.6b', 'deepseek-r1-distill-llama-70b'],
+  },
+  {
+    id: 'llama-stack', name: 'Llama Stack', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8321/v1', baseEnv: 'LLAMA_STACK_URL',
+    env: 'LLAMA_STACK_API_KEY', optionalKey: true,
+    signup: 'https://github.com/llamastack/llama-stack',
+    free: 'Runs locally or on user-controlled infrastructure; upstream inference costs depend on its configured provider.',
+    models: ['llama-3.3-70b', 'meta-llama/Llama-3.1-8B-Instruct'],
+  },
+  {
+    id: 'apipark', name: 'APIPark', badge: 'GATEWAY', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.apipark.com/v1', baseEnv: 'APIPARK_URL', env: 'APIPARK_API_KEY',
+    signup: 'https://apipark.com',
+    free: 'Gateway access depends on the models and services subscribed to by the APIPark consumer.',
+    models: ['deepseek-v3'],
+  },
+  {
+    id: 'bifrost', name: 'Bifrost AI Gateway', badge: 'LOCAL GATEWAY', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', baseEnv: 'BIFROST_URL',
+    env: 'BIFROST_API_KEY', optionalKey: true,
+    signup: 'https://github.com/maximhq/bifrost',
+    free: 'The open-source gateway runs locally; configured upstream providers retain their own pricing.',
+    models: ['openai/gpt-4o-mini'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
