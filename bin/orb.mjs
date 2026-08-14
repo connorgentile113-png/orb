@@ -6,7 +6,7 @@ import { loadConfig, saveConfig, configPath, providerBaseUrl, providerKey } from
 import { autoRouteCandidates, availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
 import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
-import { c, chatHelp, choose, divider, hyperlink, logo, paint, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
+import { c, chatHelp, choose, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
 
 function fail(message, code = 1) {
   stderr.write(`${paint(c.red, 'error')}  ${message}\n`);
@@ -238,6 +238,8 @@ async function chatCommand(args, config) {
   if (!loadConfig().selected) saveConfig(config);
   const rl = interactive ? createInterface({ input: stdin, output: stdout }) : null;
   const messages = [];
+  let lastAnswer = '';
+  let thinkingExpanded = false;
   sessionHeader(config.selected);
   try {
     let next = initial;
@@ -245,8 +247,19 @@ async function chatCommand(args, config) {
       if (interactive) next = (await rl.question(`${paint(c.cyan, '❯')} `)).trim();
       if (!next || next === '/exit' || next === '/quit') break;
       if (next === '/help') { chatHelp(); continue; }
+      if (next === '/thinking') {
+        if (!lastAnswer || !/<think(?:ing)?(?:\s[^>]*)?>/i.test(lastAnswer)) {
+          stdout.write(`${paint(c.dim, 'No thinking block in the latest response.')}\n\n`);
+          continue;
+        }
+        thinkingExpanded = !thinkingExpanded;
+        stdout.write(`\n${paint(c.blue, '◆')} ${renderRichText(lastAnswer, { thinking: thinkingExpanded })}\n\n`);
+        continue;
+      }
       if (next === '/clear') {
         messages.length = 0;
+        lastAnswer = '';
+        thinkingExpanded = false;
         if (stdout.isTTY) stdout.write('\x1b[2J\x1b[H');
         sessionHeader(config.selected);
         stdout.write(`${paint(c.green, '✓')} conversation cleared\n\n`);
@@ -260,11 +273,15 @@ async function chatCommand(args, config) {
         return chatCommand([], config);
       }
       messages.push({ role: 'user', content: next });
-      stdout.write(`\n${paint(c.blue, '◆')} `);
+      stdout.write('\n');
       let answer = '';
       try {
-        await streamCompletion({ route: config.selected, messages, config }, text => { answer += text; stdout.write(text); });
-        stdout.write('\n\n');
+        if (stdout.isTTY) stdout.write(`${paint(c.dim, 'thinking…')}\r`);
+        await streamCompletion({ route: config.selected, messages, config }, text => { answer += text; });
+        if (stdout.isTTY) stdout.write('\x1b[2K\r');
+        thinkingExpanded = false;
+        lastAnswer = answer;
+        stdout.write(`${paint(c.blue, '◆')} ${renderRichText(answer)}\n\n`);
         messages.push({ role: 'assistant', content: answer });
       } catch (error) {
         messages.pop();
@@ -298,7 +315,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.11.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.12.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());

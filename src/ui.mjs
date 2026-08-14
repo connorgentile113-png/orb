@@ -13,6 +13,61 @@ export const c = {
   selected: code('\x1b[48;5;24m\x1b[38;5;255m'),
 };
 
+const inlineMarkdown = value => {
+  let text = String(value ?? '');
+  const codeSpans = [];
+  text = text.replace(/`([^`\n]+)`/g, (_, contents) => {
+    codeSpans.push(paint(c.yellow, contents));
+    return `\u0000${codeSpans.length - 1}\u0000`;
+  });
+  text = text
+    .replace(/\*\*([^*\n]+)\*\*/g, (_, contents) => paint(c.bold, contents))
+    .replace(/__([^_\n]+)__/g, (_, contents) => paint(c.bold, contents))
+    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, (_, contents) => `\x1b[3m${contents}${c.reset}`)
+    .replace(/(?<!_)_([^_\n]+)_(?!_)/g, (_, contents) => `\x1b[3m${contents}${c.reset}`);
+  return text.replace(/\u0000(\d+)\u0000/g, (_, index) => codeSpans[Number(index)]);
+};
+
+export function parseRichText(value) {
+  const source = String(value ?? '').replace(/\r\n/g, '\n');
+  const blocks = [];
+  const pattern = /<think(?:ing)?(?:\s[^>]*)?>([\s\S]*?)(?:<\/think(?:ing)?>|$)|```([^\n`]*)\n?([\s\S]*?)(?:```|$)/gi;
+  let start = 0;
+  for (const match of source.matchAll(pattern)) {
+    if (match.index > start) blocks.push({ type: 'text', content: source.slice(start, match.index) });
+    if (match[1] !== undefined) blocks.push({ type: 'thinking', content: match[1].trim() });
+    else blocks.push({ type: 'code', language: match[2].trim(), content: match[3].replace(/\n$/, '') });
+    start = match.index + match[0].length;
+  }
+  if (start < source.length) blocks.push({ type: 'text', content: source.slice(start) });
+  return blocks;
+}
+
+function renderTextBlock(value) {
+  return String(value).split('\n').map(line => {
+    if (/^#{1,6}\s+/.test(line)) return paint(c.bold, line.replace(/^#{1,6}\s+/, ''));
+    if (/^>\s?/.test(line)) return `${paint(c.slate, '│')} ${paint(c.dim, inlineMarkdown(line.replace(/^>\s?/, '')))}`;
+    if (/^\s*[-*+]\s+/.test(line)) return line.replace(/^(\s*)[-*+]\s+/, (_, space) => `${space}${paint(c.cyan, '•')} `).replace(/^(.*)$/s, inlineMarkdown);
+    return inlineMarkdown(line);
+  }).join('\n');
+}
+
+export function renderRichText(value, { thinking = false } = {}) {
+  return parseRichText(value).map(block => {
+    if (block.type === 'thinking') {
+      if (!thinking) return `${paint(c.slate, '▸')} ${paint(c.dim, 'Thinking hidden · /thinking to expand')}`;
+      const body = block.content.split('\n').map(line => `${paint(c.slate, '│')} ${paint(c.dim, line)}`).join('\n');
+      return `${paint(c.cyan, '▾')} ${paint(c.bold, 'Thinking')}\n${body}`;
+    }
+    if (block.type === 'code') {
+      const label = block.language || 'text';
+      const body = block.content.split('\n').map(line => `${paint(c.slate, '│')} ${line}`).join('\n');
+      return `${paint(c.cyan, `┌─ ${label}`)}\n${body}\n${paint(c.cyan, '└─')}`;
+    }
+    return renderTextBlock(block.content);
+  }).join('');
+}
+
 export const paint = (color, text) => `${color}${text}${c.reset}`;
 export const plain = value => String(value ?? '').replace(ANSI, '');
 export const visibleWidth = value => [...plain(value)].length;
@@ -36,7 +91,7 @@ export function divider(stream = stdout, width = Math.min(stream.columns || 80, 
 export function sessionHeader(model, stream = stdout) {
   logo(stream);
   stream.write(`${paint(c.green, '●')} ${paint(c.bold, model)}\n`);
-  stream.write(`${paint(c.dim, '  /model switch  /clear reset  /help commands  /exit leave')}\n`);
+  stream.write(`${paint(c.dim, '  /model switch  /thinking expand  /clear reset  /help commands  /exit leave')}\n`);
   divider(stream);
 }
 
@@ -45,6 +100,7 @@ export function chatHelp(stream = stdout) {
   table([
     ['/model', 'switch provider or model'],
     ['/clear', 'start a fresh conversation'],
+    ['/thinking', 'expand or collapse the latest reasoning'],
     ['/help', 'show this command list'],
     ['/exit', 'leave orb'],
   ], [{ label: '' }, { label: '' }], stream);

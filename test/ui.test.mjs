@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'node:stream';
-import { choose, filterChoices, plain, table, truncate } from '../src/ui.mjs';
+import { choose, filterChoices, parseRichText, plain, renderRichText, table, truncate } from '../src/ui.mjs';
 
 function fakeTerminal() {
   const input = new PassThrough();
@@ -54,4 +54,12 @@ test('tables fit long content to the terminal width', () => {
     { label: 'PROVIDER' }, { label: 'MODEL' }, { label: 'STATUS' },
   ], output);
   assert.equal(rendered.trimEnd().split('\n').every(line => plain(line).length <= 40), true);
+});
+
+test('rich responses parse thinking and fenced code blocks', () => {
+  const blocks = parseRichText('<thinking>check edge cases</thinking>\n**Done**\n```js\nconst ok = true;\n```');
+  assert.deepEqual(blocks.map(block => block.type), ['thinking', 'text', 'code']);
+  assert.match(plain(renderRichText(blocks.map(block => block.type === 'thinking' ? `<thinking>${block.content}</thinking>` : block.type === 'code' ? `\`\`\`${block.language}\n${block.content}\n\`\`\`` : block.content).join(''))), /Thinking hidden/);
+  assert.match(plain(renderRichText('<thinking>detail</thinking>', { thinking: true })), /detail/);
+  assert.match(plain(renderRichText('**Bold** and *italic*\n```python\nprint(1)\n```')), /┌─ python[\s\S]*print\(1\)[\s\S]*└─/);
 });

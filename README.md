@@ -65,7 +65,11 @@ Select a provider  7/7
 - Click any provider or model in terminals with mouse reporting support.
 - Start typing to filter large provider and model lists immediately.
 - Press Backspace to edit the filter or Esc to clear/cancel.
-- During chat, use `/model`, `/clear`, `/help`, or `/exit`.
+- Model replies render Markdown-style headings, bold/italic text, inline code,
+  blockquotes, lists, and fenced code or text blocks directly in the terminal.
+- `<thinking>...</thinking>` and `<think>...</think>` sections stay collapsed by
+  default. Use `/thinking` to expand or collapse the latest response.
+- During chat, use `/model`, `/thinking`, `/clear`, `/help`, or `/exit`.
 
 The main picker intentionally shows models that are usable now. Run `orb
 providers` to see every installed integration, or add a key with `orb key set
@@ -169,6 +173,7 @@ npm run check
 npm pack --dry-run
 ```
 
-The test suite covers provider safety, routing, coding-model ranking, responsive
-tables, keyboard navigation, live filtering, and mouse selection. GitHub Actions
-runs the same checks on pushes and pull requests.
+The test suite covers provider safety, routing, coding-model ranking, rich
+response formatting, responsive tables, keyboard navigation, live filtering,
+and mouse selection. GitHub Actions runs the same checks on pushes and pull
+requests.
