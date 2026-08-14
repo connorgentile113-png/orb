@@ -78,6 +78,7 @@ bypassing a provider’s limits.
 | Nebius AI Studio | `nebius` | account credits | `https://api.studio.nebius.com/v1` |
 | xAI | `xai` | eligibility-dependent credits | `https://api.x.ai/v1` |
 | Vercel AI Gateway | `vercel` | $5 monthly gateway credits | `https://ai-gateway.vercel.sh/v1` |
+| Gonka Broker | `gonka` | at least 1M tokens/month, no card | `https://proxy.gonkabroker.com/v1` |
 | Api.Airforce | `airforce` | explicit zero-cost model routes | `https://api.airforce/v1` |
 | BazaarLink | `bazaarlink` | per-model daily free quota | `https://bazaarlink.ai/api/v1` |
 | LiteRouter | `literouter` | free-suffixed models | `https://api.literouter.com/v1` |
@@ -130,6 +131,8 @@ access requires payment verification.
 - [Ollama cloud and API-key behavior](https://docs.ollama.com/cloud)
 - [Vercel AI Gateway free-tier credits](https://vercel.com/docs/ai-gateway/pricing)
 - [Vercel OpenAI-compatible REST API](https://vercel.com/docs/ai-gateway/openai-compat/rest-api)
+- [Gonka recurring free tier](https://gonkabroker.com/free-llm-api/) and
+  [public model catalog](https://docs.gonkabroker.com/reference/supported-models/)
 - [Chutes current pay-per-token pricing](https://chutes.ai/pricing)
 - [Api.Airforce quickstart and free-plan limits](https://api.airforce/docs/quickstart/)
   and [free model identifiers](https://api.airforce/docs/api/models/)
