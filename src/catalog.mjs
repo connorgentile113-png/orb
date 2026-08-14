@@ -1580,6 +1580,16 @@ export const PROVIDERS = Object.freeze([
     free: 'The self-hosted gateway routes registered OpenAI-compatible services; upstream provider costs still apply.',
     models: ['registered-model'],
   },
+  {
+    id: 'poe', name: 'Poe API', badge: 'SUBSCRIPTION POINTS', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.poe.com/v1', env: 'POE_API_KEY',
+    signup: 'https://poe.com/api/keys',
+    free: 'Poe subscribers can use their included points through the API; additional points can be purchased.',
+    models: [
+      'Claude-Opus-4.7', 'Claude-Sonnet-4.6', 'GPT-5.4', 'GPT-5.2-Codex',
+      'Gemini-3.1-Pro', 'Grok-4.20-Multi-Agent', 'Claude-Haiku-4.5', 'GPT-5-mini',
+    ],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
