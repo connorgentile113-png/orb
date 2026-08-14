@@ -1661,6 +1661,17 @@ export const PROVIDERS = Object.freeze([
     free: 'Routes through provider keys stored in Not Diamond; upstream model charges and plan limits apply.',
     models: ['openai/gpt-4o', 'anthropic/claude-3-5-sonnet'],
   },
+  {
+    id: 'featherless', name: 'Featherless.ai', badge: 'OPEN MODELS', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.featherless.ai/v1', env: 'FEATHERLESS_API_KEY', publicCatalog: true, chatOnly: true,
+    signup: 'https://featherless.ai/account/api-keys',
+    free: 'Subscription inference across a large open-model catalog; availability and plan access vary by model class.',
+    models: [
+      'Qwen/Qwen3-Coder-30B-A3B-Instruct', 'Qwen/Qwen3.5-397B-A17B',
+      'moonshotai/Kimi-K2.5', 'zai-org/GLM-5', 'deepseek-ai/DeepSeek-R1-0528',
+      'meta-llama/Meta-Llama-3.1-8B-Instruct',
+    ],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
