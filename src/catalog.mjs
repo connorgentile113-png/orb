@@ -1672,6 +1672,37 @@ export const PROVIDERS = Object.freeze([
       'meta-llama/Meta-Llama-3.1-8B-Instruct',
     ],
   },
+  {
+    id: 'qianfan', name: 'Baidu Qianfan', badge: 'CHINA', kind: 'cloud', keyless: false,
+    baseUrl: 'https://qianfan.baidubce.com/v2', env: 'QIANFAN_API_KEY',
+    signup: 'https://console.bce.baidu.com/iam/#/iam/apikey/list',
+    free: 'Token benefit packages and pay-as-you-go billing depend on the Baidu AI Cloud account.',
+    models: [
+      'kimi-k2.6', 'deepseek-v4-flash', 'deepseek-v4-pro', 'deepseek-v3.2',
+      'glm-5', 'glm-5.1', 'minimax-m2.5', 'ernie-4.5-turbo-20260402',
+    ],
+  },
+  {
+    id: 'qianfan-intl', name: 'Baidu Qianfan International', badge: 'GLOBAL', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.baiduqianfan.ai/v1', env: 'QIANFAN_INTL_API_KEY',
+    signup: 'https://intl.cloud.baidu.com',
+    free: 'International Qianfan access is metered through the Baidu AI Cloud account.',
+    models: ['deepseek-v3.1-250821', 'deepseek-v3', 'deepseek-r1-distill-qwen-32b'],
+  },
+  {
+    id: 'xfyun-spark', name: 'iFlytek Spark', badge: 'FREE LITE', kind: 'cloud', keyless: false,
+    baseUrl: 'https://spark-api-open.xf-yun.com/v1', env: 'XFYUN_SPARK_API_PASSWORD',
+    signup: 'https://xinghuo.xfyun.cn/sparkapi',
+    free: 'Spark Lite supports free use; Pro and Ultra versions have separate token quotas and billing.',
+    models: ['lite', 'generalv3', 'generalv3.5', '4.0Ultra'],
+  },
+  {
+    id: 'xfyun-spark-x', name: 'iFlytek Spark X2 Flash', badge: 'REASONING', kind: 'cloud', keyless: false,
+    baseUrl: 'https://spark-api-open.xf-yun.com/agent/v1', env: 'XFYUN_SPARK_X_API_PASSWORD',
+    signup: 'https://www.xfyun.cn/doc/spark/X2-Flash.html',
+    free: 'Uses the Spark X2 Flash HTTP quota associated with its API password or AK:SK credential.',
+    models: ['spark-x'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
