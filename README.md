@@ -14,12 +14,18 @@ provider APIs through one clean CLI and an OpenAI-compatible localhost server.
 Requirements: Node.js 22 or newer. Install directly from the public GitHub repository on macOS, Linux, or Windows:
 
 ```bash
-npm install -g github:connorgentile113-png/orb
+npm install -g orb-ai
 orb --version
 orb
 ```
 
-Or install from a GitHub checkout:
+Until the npm release is published, or to install directly from GitHub:
+
+```bash
+npm install -g github:connorgentile113-png/orb
+```
+
+Or install from a checkout:
 
 ```bash
 git clone https://github.com/connorgentile113-png/orb.git
@@ -39,7 +45,7 @@ npm install -g .
 To uninstall:
 
 ```bash
-npm uninstall -g orb-route
+npm uninstall -g orb-ai
 ```
 
 If Ollama is running, `orb` discovers its installed models and is ready
