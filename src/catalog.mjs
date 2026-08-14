@@ -1710,6 +1710,13 @@ export const PROVIDERS = Object.freeze([
     free: 'Yi model and smart-routing usage follows the credits and billing configured on the Lingyi Wanwu account.',
     models: ['yi-lightning', 'yi-vision-v2'],
   },
+  {
+    id: 'sensenova', name: 'SenseNova', badge: 'CHINA', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.sensenova.cn/compatible-mode/v1', env: 'SENSENOVA_API_TOKEN',
+    signup: 'https://console.sensecore.cn/aistudio/management/service-manage',
+    free: 'Access and quota depend on the SenseCore service activation; supply a current bearer API token.',
+    models: ['SenseChat-Character', 'SenseChat-Character-Pro', 'SenseChat-Character-Turbo'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
