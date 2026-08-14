@@ -36,6 +36,37 @@ export const PROVIDERS = Object.freeze([
     free: 'Connects to a self-hosted Friendli Container on its documented default port.', models: [],
   },
   {
+    id: 'fastchat', name: 'FastChat', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', env: null,
+    signup: 'https://github.com/lm-sys/FastChat/blob/main/docs/openai_api.md',
+    free: 'Connects to FastChat’s self-hosted OpenAI-compatible API server.', models: [],
+  },
+  {
+    id: 'triton-openai', name: 'NVIDIA Triton OpenAI Frontend', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:9000/v1', env: null,
+    signup: 'https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/client_guide/openai_readme.html',
+    free: 'Discovers models served by Triton’s OpenAI-compatible frontend on port 9000.',
+    models: ['tensorrt_llm_bls'],
+  },
+  {
+    id: 'open-webui', name: 'Open WebUI', badge: 'LOCAL', kind: 'local', keyless: false,
+    baseUrl: 'http://127.0.0.1:3000/api', env: 'OPEN_WEBUI_API_KEY',
+    signup: 'https://docs.openwebui.com/reference/api-endpoints/',
+    free: 'Routes through a self-hosted Open WebUI instance and its connected local or cloud models.', models: [],
+  },
+  {
+    id: 'lemonade', name: 'Lemonade Server', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/api/v1', env: null,
+    signup: 'https://github.com/lemonade-sdk/lemonade',
+    free: 'Runs ONNX models locally through Lemonade’s OpenAI-compatible server.', models: [],
+  },
+  {
+    id: 'bedrock-gateway', name: 'Bedrock Access Gateway', badge: 'SELF HOSTED', kind: 'local', keyless: false,
+    baseUrl: 'http://127.0.0.1:8000/api/v1', env: 'BEDROCK_GATEWAY_API_KEY',
+    signup: 'https://github.com/aws-samples/bedrock-access-gateway',
+    free: 'The gateway is self-hosted; underlying Amazon Bedrock model usage remains metered.', models: [],
+  },
+  {
     id: 'localai', name: 'LocalAI', badge: 'LOCAL', kind: 'local', keyless: true,
     baseUrl: 'http://127.0.0.1:8080/v1', env: null,
     signup: 'https://github.com/mudler/LocalAI',
