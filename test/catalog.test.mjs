@@ -21,11 +21,21 @@ test('filters dynamic catalogs down to free routes', () => {
     { id: 'metered', usage_based_only: true }, { id: 'included', usage_based_only: false },
   ] }), ['included']);
 
+  const tierProvider = { modelPolicy: 'free-tier' };
+  assert.deepEqual(modelIdsFromResponse(tierProvider, { data: [
+    { id: 'free-by-price', pricepermilliontokens: 0, output_pricepermilliontokens: 0 },
+    { id: 'free-by-nested-price', pricing: { prompt: '0', completion: '0' } },
+    { id: 'free-by-name:free', tier: 'metered' },
+    { id: 'free-tier-but-metered', tier: 'free', pricepermilliontokens: 2, output_pricepermilliontokens: 3 },
+  ] }), ['free-by-price', 'free-by-nested-price', 'free-by-name:free']);
+
   const chatProvider = { chatOnly: true };
   assert.deepEqual(modelIdsFromResponse(chatProvider, { data: [
     { id: 'chat-model', max_completion_tokens: 4096 },
     { id: 'embedding-model', max_completion_tokens: 0 },
     { id: 'Safety-Guard', max_completion_tokens: 4096 },
+    { id: 'voiceover', supports_chat: false },
+    { id: 'text-to-image', output_modalities: ['image'] },
   ] }), ['chat-model']);
 });
 

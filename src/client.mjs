@@ -14,7 +14,7 @@ function timeoutSignal(ms) {
 }
 
 function headersFor(provider, key) {
-  const headers = { accept: 'application/json', 'content-type': 'application/json' };
+  const headers = { accept: 'application/json', 'content-type': 'application/json', ...provider.headers };
   if (key) headers.authorization = `Bearer ${key}`;
   return headers;
 }
@@ -60,8 +60,15 @@ export async function autoRouteCandidates(config, env = process.env) {
       if (local[0]) routes.push(routeName('ollama', local[0]));
     } catch { /* local inference is optional */ }
   }
-  return [...new Set([...routes, ...DEFAULT_AUTO_ROUTES])];
+  const configuredFree = PROVIDERS_WITH_AUTO_MODELS
+    .filter(provider => isConfigured(provider, config, env))
+    .map(provider => routeName(provider.id, provider.autoModel));
+  return [...new Set([...routes, ...configuredFree, ...DEFAULT_AUTO_ROUTES])];
 }
+
+const PROVIDERS_WITH_AUTO_MODELS = [...PROVIDER_BY_ID.values()]
+  .filter(provider => provider.autoModel)
+  .sort((left, right) => (left.autoPriority || 100) - (right.autoPriority || 100));
 
 export function modelIdsFromResponse(provider, body) {
   if (provider.discover === false) return [...provider.models];
@@ -75,13 +82,26 @@ export function modelIdsFromResponse(provider, body) {
   if (provider.modelPolicy === 'included-tier') {
     items = items.filter(item => typeof item === 'object' && item.usage_based_only === false);
   }
+  if (provider.modelPolicy === 'free-tier') {
+    items = items.filter(item => {
+      const id = typeof item === 'string' ? item : item.id || item.name || '';
+      if (id.includes(':free')) return true;
+      if (typeof item !== 'object') return false;
+      const input = item.pricepermilliontokens ?? item.pricing?.input ?? item.pricing?.prompt;
+      const output = item.output_pricepermilliontokens ?? item.pricing?.output ?? item.pricing?.completion;
+      return input !== undefined && output !== undefined && Number(input) === 0 && Number(output) === 0;
+    });
+  }
   if (provider.chatOnly) {
     items = items.filter(item => {
       if (typeof item === 'string') return true;
       const id = item.id || item.name || '';
       const supportsCompletion = item.max_completion_tokens === undefined || item.max_completion_tokens > 0;
       const chatType = item.model_type === undefined || item.model_type === 'chat';
-      return supportsCompletion && chatType && !/guard|embedding|whisper|stable-diffusion/i.test(id);
+      const supportsChat = item.supports_chat === undefined || item.supports_chat === true;
+      const textOutput = !Array.isArray(item.output_modalities) || item.output_modalities.includes('text');
+      return supportsCompletion && chatType && supportsChat && textOutput
+        && !/guard|embed|rerank|whisper|stable-diffusion|image-|audio|voice|suno|kling|veo|banana/i.test(id);
     });
   }
   return items.map(item => typeof item === 'string' ? item : item.id || item.name).filter(Boolean);
@@ -90,7 +110,7 @@ export function modelIdsFromResponse(provider, body) {
 export async function discoverModels(provider, config, { env = process.env, timeout = 5_000 } = {}) {
   if (provider.discover === false) return [...provider.models];
   const key = providerKey(provider, config, env);
-  if (!provider.keyless && !key) return [];
+  if (!provider.keyless && !key && !provider.publicCatalog) return [];
   if (!providerBaseUrl(provider, config, env)) return [];
   let url = `${providerBaseUrl(provider, config, env)}/models`;
   if (provider.id === 'ollama' || provider.protocol === 'ollama') url = provider.modelsUrl;

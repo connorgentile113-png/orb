@@ -73,6 +73,7 @@ ${paint(c.bold, 'Usage')}  orb <command> [options]
   ${paint(c.cyan, 'orb use auto/free')}           enable automatic free fallback
   ${paint(c.cyan, 'orb models')} [--refresh]      list available models
   ${paint(c.cyan, 'orb providers')}               list direct API providers
+  ${paint(c.cyan, 'orb signup')} <provider>       show where to get a free API key
   ${paint(c.cyan, 'orb routes')}                  show auto/free fallback order
   ${paint(c.cyan, 'orb key set')} <provider>      save a provider API key
   ${paint(c.cyan, 'orb key remove')} <provider>   remove a saved API key

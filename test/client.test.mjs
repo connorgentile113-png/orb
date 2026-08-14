@@ -1,14 +1,58 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import { autoRouteCandidates, completionText, createChatCompletion, streamCompletion } from '../src/client.mjs';
+import { autoRouteCandidates, completionText, createChatCompletion, discoverModels, streamCompletion } from '../src/client.mjs';
 import { emptyConfig } from '../src/config.mjs';
+import { PROVIDER_BY_ID } from '../src/catalog.mjs';
 
 test('automatic route override excludes recursive auto entries', async () => {
   assert.deepEqual(
     await autoRouteCandidates(emptyConfig(), { ORB_AUTO_ROUTES: 'auto/free, opencode/big-pickle, kilo/openrouter/free' }),
     ['opencode/big-pickle', 'kilo/openrouter/free'],
   );
+});
+
+test('automatic routing adds configured free-only providers before keyless fallbacks', async () => {
+  const config = { ...emptyConfig(), keys: { airforce: 'test', bazaarlink: 'test', morph: 'test' } };
+  const routes = await autoRouteCandidates(config, { ORB_DISABLE_LOCAL: '1' });
+  assert.deepEqual(routes.slice(0, 2), ['bazaarlink/auto:free', 'airforce/gemma3-270m:free']);
+  assert.equal(routes.includes('morph/morph-v3-fast'), false);
+  assert.equal(routes.includes('opencode/big-pickle'), true);
+});
+
+test('public model catalogs can be refreshed before adding an API key', async t => {
+  const upstream = http.createServer((request, response) => {
+    assert.equal(request.url, '/v1/models');
+    assert.equal(request.headers.authorization, undefined);
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({ data: [
+      { id: 'free-model:free', tier: 'free' },
+      { id: 'paid-model', tier: 'free', pricepermilliontokens: 1, output_pricepermilliontokens: 2 },
+    ] }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(),
+    providers: { airforce: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.deepEqual(await discoverModels(PROVIDER_BY_ID.get('airforce'), config), ['free-model:free']);
+});
+
+test('provider safety headers are forwarded to free-model gateways', async t => {
+  const upstream = http.createServer(async (request, response) => {
+    assert.equal(request.headers.authorization, 'Bearer test-key');
+    assert.equal(request.headers['x-free-fallback'], 'false');
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'safe free route' } }] }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { bazaarlink: 'test-key' },
+    providers: { bazaarlink: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.equal(await completionText({ route: 'bazaarlink/auto:free', messages: [], config }), 'safe free route');
 });
 
 test('adapts Ollama Cloud native responses to OpenAI chat responses', async t => {

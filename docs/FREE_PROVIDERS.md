@@ -17,6 +17,11 @@ bypassing a provider’s limits.
 - [open-free-llm-api/awesome-freellm-apis](https://github.com/open-free-llm-api/awesome-freellm-apis)
   — machine-updated endpoint and model cross-check used for the second provider
   round.
+- [velo4705/awesome-free-byok-models](https://github.com/velo4705/awesome-free-byok-models)
+  — current free-model suffixes and small-provider discovery.
+- [OmniRoute Free Tiers wiki](https://github.com/diegosouzapw/OmniRoute/wiki/Free-Tiers)
+  — broad recurring-quota and terms-of-service audit used to find the third
+  provider round.
 
 ## Added to orb
 
@@ -30,6 +35,9 @@ bypassing a provider’s limits.
 | LocalAI | `localai` | local, keyless | `http://127.0.0.1:8080/v1` |
 | Jan | `jan` | local, keyless | `http://127.0.0.1:1337/v1` |
 | KoboldCpp | `koboldcpp` | local, keyless | `http://127.0.0.1:5001/v1` |
+| GPT4All | `gpt4all` | local, keyless | `http://127.0.0.1:4891/v1` |
+| Text Generation WebUI | `textgen` | local, keyless | `http://127.0.0.1:5000/v1` |
+| llama-swap | `llama-swap` | local, keyless | `http://127.0.0.1:8080/v1` |
 | Pollinations legacy community endpoint | `pollinations` | keyless, rate-limited | `https://text.pollinations.ai/openai` |
 | Google Gemini | `gemini` | free tier | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | GroqCloud | `groq` | free tier | `https://api.groq.com/openai/v1` |
@@ -61,6 +69,15 @@ bypassing a provider’s limits.
 | Nebius AI Studio | `nebius` | account credits | `https://api.studio.nebius.com/v1` |
 | xAI | `xai` | eligibility-dependent credits | `https://api.x.ai/v1` |
 | Vercel AI Gateway | `vercel` | $5 monthly gateway credits | `https://ai-gateway.vercel.sh/v1` |
+| Api.Airforce | `airforce` | explicit zero-cost model routes | `https://api.airforce/v1` |
+| BazaarLink | `bazaarlink` | per-model daily free quota | `https://bazaarlink.ai/api/v1` |
+| LiteRouter | `literouter` | free-suffixed models | `https://api.literouter.com/v1` |
+| LLM.kiwi | `llm-kiwi` | no-card free account | `https://api.llm.kiwi/v1` |
+| Public AI Gateway | `publicai` | public-interest free tier | `https://api.publicai.co/v1` |
+| Morph | `morph` | 200 free requests/month | `https://api.morphllm.com/v1` |
+| Ant Ling | `ant-ling` | 500K tokens/day | `https://api.ant-ling.com/v1` |
+| LongCat | `longcat` | one-time evaluation grant | `https://api.longcat.chat/openai/v1` |
+| Reka | `reka` | metered; free account only | `https://api.reka.ai/v1` |
 
 GitHub Models remains in the catalog for compatibility but is marked `FREE
 RETIRED`: the reviewed catalog records retirement of its free tier on
@@ -84,6 +101,19 @@ access requires payment verification.
 - [Vercel AI Gateway free-tier credits](https://vercel.com/docs/ai-gateway/pricing)
 - [Vercel OpenAI-compatible REST API](https://vercel.com/docs/ai-gateway/openai-compat/rest-api)
 - [Chutes current pay-per-token pricing](https://chutes.ai/pricing)
+- [Api.Airforce quickstart and free-plan limits](https://api.airforce/docs/quickstart/)
+  and [free model identifiers](https://api.airforce/docs/api/models/)
+- [BazaarLink free-model rules](https://bazaarlink.ai/docs)
+- [LiteRouter API and free-suffix behavior](https://literouter.com/api_docs)
+- [LLM.kiwi OpenAI-compatible API](https://llm.kiwi/docs)
+- [Public AI API setup and rate limits](https://platform.publicai.co/docs)
+- [Morph monthly allowance and model pricing](https://www.morphllm.com/pricing)
+- [Ant Ling recurring allowance](https://developer.ant-ling.com/en/docs/models/price/)
+- [LongCat API overview](https://longcat.chat/platform/docs/APIDocs.html)
+- [Reka API quickstart](https://docs.reka.ai/quickstart) and
+  [current metered pricing](https://docs.reka.ai/pricing)
+- [GPT4All local API server](https://github.com/nomic-ai/gpt4all/wiki/Local-API-Server)
+- [llama-swap OpenAI-compatible endpoints](https://github.com/mostlygeek/llama-swap)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves

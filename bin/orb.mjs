@@ -99,6 +99,14 @@ function providersCommand(config) {
   stdout.write(`\n${paint(c.dim, '● ready   ○ add the provider API key')}\n`);
 }
 
+function signupCommand(args) {
+  const provider = PROVIDER_BY_ID.get(args[0]);
+  if (!provider) throw new Error(`Unknown provider: ${args[0] || '(missing)'}`);
+  if (!provider.signup) throw new Error(`${provider.name} has no signup page.`);
+  stdout.write(`${paint(c.bold, provider.name)}\n${provider.signup}\n`);
+  if (provider.env) stdout.write(`${paint(c.dim, `then run: orb key set ${provider.id}  ·  env: ${provider.env}`)}\n`);
+}
+
 async function routesCommand(config) {
   const routes = await autoRouteCandidates(config, process.env);
   table(routes.map((route, index) => [index + 1, route]), [{ label: 'PRIORITY' }, { label: 'AUTO/FREE ROUTE' }]);
@@ -234,7 +242,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.3.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.4.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());
@@ -246,6 +254,7 @@ async function main() {
   if (command === 'use') return useCommand(args, config);
   if (command === 'models') return modelsCommand(args, config);
   if (command === 'providers') return providersCommand(config);
+  if (command === 'signup') return signupCommand(args);
   if (command === 'routes') return routesCommand(config);
   if (command === 'key' || command === 'keys') return keyCommand(args, config);
   if (command === 'endpoint' || command === 'endpoints') return endpointCommand(args, config);

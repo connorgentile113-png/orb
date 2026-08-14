@@ -18,6 +18,10 @@ needed for it. Keyless cloud routes from LLM7, Kilo Gateway, OpenCode, OVHcloud,
 and Pollinations are also discovered automatically; their public quotas and
 availability vary.
 
+The v0.4 catalog contains 53 providers, 10 local runtimes, and 175 seeded model
+routes. Public model catalogs are refreshed when possible, so the seed list is
+only a safe offline starting point.
+
 ## Commands
 
 ```text
@@ -28,6 +32,7 @@ orb use auto/free           use local-first automatic free fallback
 orb models --refresh        discover models from ready providers
 orb models --all            include providers that need keys
 orb providers               show access terms and readiness
+orb signup airforce         show the provider key/signup page
 orb routes                  show the auto/free fallback order
 orb key set groq            securely prompt for a direct API key
 orb endpoint set cloudflare https://.../ai/v1
@@ -49,6 +54,10 @@ orb use auto/free
 LLM7, Pollinations, and OVHcloud routes. Set `ORB_AUTO_ROUTES` to a comma-separated
 list of `provider/model` routes to customize that order, or set
 `ORB_DISABLE_LOCAL=1` to skip Ollama in automatic routing.
+When a key is configured, explicit free-only routes from Api.Airforce,
+BazaarLink, LiteRouter, and Public AI are inserted ahead of the anonymous
+fallbacks. Providers whose free allowance can spill into metered usage are not
+added automatically. BazaarLink requests also send `X-Free-Fallback: false`.
 For non-interactive first use, `orb chat "hello"` automatically selects
 `auto/free` when no local model or saved selection exists.
 
