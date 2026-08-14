@@ -67,6 +67,12 @@ export const PROVIDERS = Object.freeze([
     free: 'The gateway is self-hosted; underlying Amazon Bedrock model usage remains metered.', models: [],
   },
   {
+    id: 'kubeai', name: 'KubeAI', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8081/openai/v1', env: null,
+    signup: 'https://www.kubeai.org',
+    free: 'Discovers models served by a local KubeAI Kubernetes installation.', models: [],
+  },
+  {
     id: 'localai', name: 'LocalAI', badge: 'LOCAL', kind: 'local', keyless: true,
     baseUrl: 'http://127.0.0.1:8080/v1', env: null,
     signup: 'https://github.com/mudler/LocalAI',
@@ -641,6 +647,31 @@ export const PROVIDERS = Object.freeze([
     baseUrl: '', baseEnv: 'AZURE_FOUNDRY_BASE_URL', requiresBaseUrl: true,
     env: 'AZURE_FOUNDRY_API_KEY', signup: 'https://ai.azure.com',
     free: 'Deployment usage is metered; set the resource’s OpenAI-compatible `/openai/v1` base URL.', models: [],
+  },
+  {
+    id: 'anyscale', name: 'Anyscale Service', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'ANYSCALE_SERVICE_BASE_URL', requiresBaseUrl: true,
+    env: 'ANYSCALE_SERVICE_TOKEN', signup: 'https://console.anyscale.com',
+    free: 'Managed Ray Serve compute is usage-billed; set the deployed service `/v1` base URL.', models: [],
+  },
+  {
+    id: 'beam', name: 'Beam Cloud', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'BEAM_OPENAI_BASE_URL', requiresBaseUrl: true,
+    env: 'BEAM_API_KEY', signup: 'https://platform.beam.cloud',
+    free: 'Serverless GPU compute is usage-billed; set the deployed vLLM or SGLang `/v1` URL.',
+    models: ['Qwen/Qwen2.5-7B-Instruct'],
+  },
+  {
+    id: 'cerebrium', name: 'Cerebrium Deployment', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'CEREBRIUM_OPENAI_BASE_URL', requiresBaseUrl: true,
+    env: 'CEREBRIUM_API_KEY', signup: 'https://dashboard.cerebrium.ai',
+    free: 'Serverless compute is usage-billed; set the OpenAI-compatible deployment base URL.', models: [],
+  },
+  {
+    id: 'crusoe', name: 'Crusoe Managed Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.inference.crusoecloud.com/v1', env: 'CRUSOE_INFERENCE_API_KEY',
+    signup: 'https://console.crusoecloud.com',
+    free: 'Serverless or reserved inference usage is billed through Crusoe Intelligence Foundry.', models: [],
   },
   {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
