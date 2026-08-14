@@ -315,6 +315,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
+  if (args.some(value => value === '--help' || value === '-h')) return stdout.write(usage());
   if (command === '--version' || command === '-v') return stdout.write('orb 0.13.0\n');
   const config = loadConfig();
   if (!command) {
