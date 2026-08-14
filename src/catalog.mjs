@@ -1326,6 +1326,30 @@ export const PROVIDERS = Object.freeze([
     free: 'Serverless and batch inference are usage-priced; model availability is discoverable through the API.',
     models: ['parasail-llama-33-70b-fp8', 'parasail-deepseek-r1', 'Olmo-3-32B-Think'],
   },
+  {
+    id: 'vertex-openai', name: 'Google Vertex AI (OpenAI)', badge: 'CLOUD', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'VERTEX_OPENAI_BASE_URL', requiresBaseUrl: true,
+    env: 'VERTEX_ACCESS_TOKEN',
+    signup: 'https://console.cloud.google.com/vertex-ai',
+    free: 'Uses Google Cloud billing; set the project/location OpenAI endpoint and a current OAuth access token.',
+    models: ['google/gemini-2.5-flash', 'google/gemini-2.0-flash-001'],
+  },
+  {
+    id: 'kserve', name: 'KServe Generative Inference', badge: 'SELF-HOSTED', kind: 'local', keyless: true,
+    baseUrl: '', baseEnv: 'KSERVE_OPENAI_URL', requiresBaseUrl: true,
+    env: 'KSERVE_API_KEY', optionalKey: true,
+    signup: 'https://kserve.github.io/website/',
+    free: 'Runs in the user’s Kubernetes cluster; provide the service URL ending in /openai/v1.',
+    models: ['llama3'],
+  },
+  {
+    id: 'redhat-inference', name: 'Red Hat AI Inference Server', badge: 'LOCAL GPU', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', baseEnv: 'REDHAT_INFERENCE_URL',
+    env: 'REDHAT_INFERENCE_API_KEY', optionalKey: true,
+    signup: 'https://www.redhat.com/en/products/ai/inference-server',
+    free: 'Runs on user-controlled GPU infrastructure; registry and Red Hat subscription terms apply.',
+    models: ['RedHatAI/Llama-3.2-1B-Instruct-FP8'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
