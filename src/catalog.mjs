@@ -1628,6 +1628,14 @@ export const PROVIDERS = Object.freeze([
     free: 'The free plan can directly invoke Arcee SLMs; third-party frontier routes require an eligible paid account.',
     models: ['auto', 'coder', 'virtuoso-large', 'virtuoso-medium', 'blitz', 'gpt-4.1', 'claude-3-7-sonnet-20250219'],
   },
+  {
+    id: 'ktransformers', name: 'KTransformers', badge: 'LOCAL HYBRID', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:30000/v1', baseEnv: 'KTRANSFORMERS_URL',
+    env: 'KTRANSFORMERS_API_KEY', optionalKey: true,
+    signup: 'https://github.com/kvcache-ai/ktransformers',
+    free: 'Runs large models locally with CPU/GPU hybrid offloading and no per-token service fee.',
+    models: ['DeepSeek-Coder-V2-Instruct', 'Qwen/Qwen3-Coder-30B-A3B-Instruct'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
