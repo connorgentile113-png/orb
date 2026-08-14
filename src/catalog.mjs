@@ -1597,6 +1597,23 @@ export const PROVIDERS = Object.freeze([
     free: 'Provide the endpoint-specific openai.vast.ai URL ending in /v1; serverless GPU usage is metered.',
     models: ['Qwen/Qwen3-8B', 'Qwen/Qwen3-30B-A3B'],
   },
+  {
+    id: 'prime-intellect', name: 'Prime Intellect Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.pinference.ai/api/v1', env: 'PRIME_INTELLECT_API_KEY',
+    signup: 'https://app.primeintellect.ai/dashboard/tokens',
+    free: 'Token-based inference is deducted from the Prime Intellect account balance; pricing varies by model.',
+    models: [
+      'meta-llama/llama-3.1-70b-instruct', 'Qwen/Qwen3-4B-Instruct-2507',
+      'Qwen/Qwen3-Coder-30B-A3B-Instruct',
+    ],
+  },
+  {
+    id: 'routstr', name: 'Routstr', badge: 'BITCOIN · ECASH', kind: 'community', keyless: false,
+    baseUrl: 'https://api.routstr.com/v1', env: 'ROUTSTR_API_KEY',
+    signup: 'https://routstr.com',
+    free: 'Fund a session key with Lightning or use a Cashu token directly; requests spend the attached balance.',
+    models: ['gpt-4o', 'gpt-4'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
