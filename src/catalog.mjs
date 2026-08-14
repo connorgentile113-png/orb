@@ -1540,6 +1540,14 @@ export const PROVIDERS = Object.freeze([
       '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
     ],
   },
+  {
+    id: 'predibase', name: 'Predibase Dedicated Deployment', badge: 'CUSTOM ENDPOINT', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'PREDIBASE_DEPLOYMENT_URL', requiresBaseUrl: true,
+    env: 'PREDIBASE_API_TOKEN', authBodyField: 'api_token',
+    signup: 'https://docs.predibase.com/api-reference/inference-api/create-chat-completion',
+    free: 'Provide the deployment URL ending in /v1; dedicated deployment and adapter usage is billed by Predibase.',
+    models: ['meta-llama/Llama-3.1-8B-Instruct', 'alignment-handbook/zephyr-7b-dpo-lora', 'deployment-model'],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));

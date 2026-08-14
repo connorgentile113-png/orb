@@ -83,6 +83,25 @@ test('provider-specific authentication headers are supported', async t => {
   assert.deepEqual(await discoverModels(PROVIDER_BY_ID.get('wso2-ai'), config), ['gpt-5.4']);
 });
 
+test('provider credentials can be sent in the request body', async t => {
+  const upstream = http.createServer(async (request, response) => {
+    assert.equal(request.headers.authorization, undefined);
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    const body = JSON.parse(Buffer.concat(chunks));
+    assert.equal(body.api_token, 'predibase-test-token');
+    response.setHeader('content-type', 'application/json');
+    response.end(JSON.stringify({ choices: [{ message: { role: 'assistant', content: 'body auth works' } }] }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { predibase: 'predibase-test-token' },
+    providers: { predibase: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.equal(await completionText({ route: 'predibase/deployment-model', messages: [], config }), 'body auth works');
+});
+
 test('adapts Ollama Cloud native responses to OpenAI chat responses', async t => {
   const upstream = http.createServer(async (request, response) => {
     assert.equal(request.url, '/api/chat');

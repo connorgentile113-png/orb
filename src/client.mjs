@@ -18,7 +18,7 @@ function headersFor(provider, key) {
   if (key && provider.protocol === 'anthropic') {
     headers['x-api-key'] = key;
     headers['anthropic-version'] = '2023-06-01';
-  } else if (key) {
+  } else if (key && !provider.authBodyField) {
     const name = provider.authHeader || 'authorization';
     const prefix = provider.authPrefix === undefined ? 'Bearer ' : provider.authPrefix;
     headers[name] = `${prefix}${key}`;
@@ -306,6 +306,7 @@ export async function createChatCompletion({ route, messages, stream = false, co
   const body = provider.protocol === 'anthropic'
     ? { model, messages: messages.filter(message => message.role !== 'system'), stream, max_tokens: 8192, ...(system ? { system } : {}) }
     : { model, messages, stream };
+  if (key && provider.authBodyField) body[provider.authBodyField] = key;
   if (temperature !== undefined) body.temperature = temperature;
   const response = await fetch(url, {
     method: 'POST', headers: headersFor(provider, key), body: JSON.stringify(body),
