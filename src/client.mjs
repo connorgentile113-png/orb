@@ -316,14 +316,23 @@ export async function createChatCompletion({ route, messages, stream = false, co
 export async function completionText(options) {
   const response = await createChatCompletion({ ...options, stream: false });
   const body = await jsonOrError(response);
-  return body.choices?.[0]?.message?.content ?? body.choices?.[0]?.text ?? '';
+  const choice = body.choices?.[0];
+  const message = choice?.message;
+  const content = message?.content ?? choice?.text ?? '';
+  const reasoning = message?.reasoning_content ?? message?.reasoning;
+  return reasoning ? `<thinking>${reasoning}</thinking>${content}` : content;
 }
 
-function extractSseText(payload) {
+function extractSseParts(payload) {
   try {
     const value = JSON.parse(payload);
-    return value.choices?.[0]?.delta?.content ?? value.choices?.[0]?.message?.content ?? '';
-  } catch { return ''; }
+    const choice = value.choices?.[0];
+    const part = choice?.delta || choice?.message || {};
+    return {
+      content: part.content ?? '',
+      reasoning: part.reasoning_content ?? part.reasoning ?? '',
+    };
+  } catch { return { content: '', reasoning: '' }; }
 }
 
 export async function streamCompletion(options, onText) {
@@ -331,6 +340,7 @@ export async function streamCompletion(options, onText) {
   if (!response.body) throw new Error('Provider returned no response stream.');
   const decoder = new TextDecoder();
   let buffer = '';
+  let reasoningOpen = false;
   for await (const chunk of response.body) {
     buffer += decoder.decode(chunk, { stream: true });
     const lines = buffer.split(/\r?\n/);
@@ -339,9 +349,17 @@ export async function streamCompletion(options, onText) {
       if (!line.startsWith('data:')) continue;
       const data = line.slice(5).trim();
       if (data && data !== '[DONE]') {
-        const text = extractSseText(data);
-        if (text) onText(text);
+        const { content, reasoning } = extractSseParts(data);
+        if (reasoning) {
+          if (!reasoningOpen) { onText('<thinking>'); reasoningOpen = true; }
+          onText(reasoning);
+        }
+        if (content) {
+          if (reasoningOpen) { onText('</thinking>'); reasoningOpen = false; }
+          onText(content);
+        }
       }
     }
   }
+  if (reasoningOpen) onText('</thinking>');
 }

@@ -138,6 +138,34 @@ test('adapts Anthropic messages and thinking to OpenAI chat responses', async t 
   assert.equal(streamed, '<thinking>check first</thinking>Hello!');
 });
 
+test('normalizes OpenAI-compatible reasoning content into thinking blocks', async t => {
+  const upstream = http.createServer(async (request, response) => {
+    const chunks = [];
+    for await (const chunk of request) chunks.push(chunk);
+    const body = JSON.parse(Buffer.concat(chunks));
+    response.setHeader('content-type', body.stream ? 'text/event-stream' : 'application/json');
+    if (body.stream) {
+      response.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning_content: 'check ' } }] })}\n\n`);
+      response.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning_content: 'carefully' } }] })}\n\n`);
+      response.write(`data: ${JSON.stringify({ choices: [{ delta: { content: 'Done.' } }] })}\n\n`);
+      return response.end('data: [DONE]\n\n');
+    }
+    response.end(JSON.stringify({ choices: [{ message: {
+      role: 'assistant', reasoning_content: 'check carefully', content: 'Done.',
+    } }] }));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { gmi: 'test-key' },
+    providers: { gmi: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  assert.equal(await completionText({ route: 'gmi/test', messages: [], config }), '<thinking>check carefully</thinking>Done.');
+  let streamed = '';
+  await streamCompletion({ route: 'gmi/test', messages: [], config }, text => { streamed += text; });
+  assert.equal(streamed, '<thinking>check carefully</thinking>Done.');
+});
+
 test('auto/free falls back after an upstream failure', async t => {
   const upstream = http.createServer(async (request, response) => {
     const chunks = [];

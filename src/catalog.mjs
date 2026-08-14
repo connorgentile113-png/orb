@@ -539,6 +539,19 @@ export const PROVIDERS = Object.freeze([
     models: ['claude-opus-4-5', 'claude-4-5-sonnet', 'claude-4-5-haiku', 'qwen3-coder-480b', 'gpt-oss-120b'],
   },
   {
+    id: 'gmi', name: 'GMI Cloud', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.gmi-serving.com/v1', env: 'GMI_API_KEY',
+    signup: 'https://console.gmicloud.ai',
+    free: 'Inference Engine usage is metered through the GMI Cloud organization.',
+    models: ['deepseek-ai/DeepSeek-R1'],
+  },
+  {
+    id: 'modal', name: 'Modal Endpoint', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'MODAL_ENDPOINT_BASE_URL', requiresBaseUrl: true,
+    env: 'MODAL_PROXY_TOKEN', signup: 'https://modal.com/docs/guide/endpoints',
+    free: 'Compute is usage-billed; set the deployed endpoint `/v1` URL and combined proxy token.', models: [],
+  },
+  {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
     baseUrl: 'https://api-inference.modelscope.cn/v1', env: 'MODELSCOPE_SDK_TOKEN',
     signup: 'https://modelscope.cn/my/myaccesstoken',
