@@ -73,6 +73,18 @@ export const PROVIDERS = Object.freeze([
     free: 'Discovers models served by a local KubeAI Kubernetes installation.', models: [],
   },
   {
+    id: 'kong-ai', name: 'Kong AI Gateway', badge: 'SELF HOSTED', kind: 'local', keyless: true,
+    baseUrl: '', baseEnv: 'KONG_AI_GATEWAY_BASE_URL', requiresBaseUrl: true,
+    env: 'KONG_AI_GATEWAY_KEY', optionalKey: true, signup: 'https://docs.konghq.com/gateway/latest/ai-gateway/',
+    free: 'Connects to a configured Kong AI Proxy route; upstream model charges may still apply.', models: [],
+  },
+  {
+    id: 'tyk-ai', name: 'Tyk AI Studio', badge: 'SELF HOSTED', kind: 'local', keyless: false,
+    baseUrl: '', baseEnv: 'TYK_AI_STUDIO_BASE_URL', requiresBaseUrl: true,
+    env: 'TYK_AI_STUDIO_API_KEY', signup: 'https://tyk.io/docs/ai-management/ai-studio/quickstart',
+    free: 'Connects to a Tyk OpenAI-compatible route; upstream model charges depend on its configuration.', models: [],
+  },
+  {
     id: 'localai', name: 'LocalAI', badge: 'LOCAL', kind: 'local', keyless: true,
     baseUrl: 'http://127.0.0.1:8080/v1', env: null,
     signup: 'https://github.com/mudler/LocalAI',
@@ -692,6 +704,25 @@ export const PROVIDERS = Object.freeze([
     signup: 'https://console.volcengine.com/ark/region:ark+cn-beijing/apikey',
     free: 'ModelArk usage is metered through Volcano Engine.',
     models: ['doubao-seed-2-0-lite-260215', 'doubao-seed-1-6-251015'],
+  },
+  {
+    id: 'dstack', name: 'dstack Service', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'DSTACK_OPENAI_BASE_URL', requiresBaseUrl: true,
+    env: 'DSTACK_SERVICE_TOKEN', signup: 'https://dstack.ai/docs/services/',
+    free: 'Compute charges depend on the configured backend; set the service’s OpenAI-compatible base URL.', models: [],
+  },
+  {
+    id: 'pai-eas', name: 'Alibaba PAI-EAS', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'PAI_EAS_BASE_URL', requiresBaseUrl: true,
+    env: 'PAI_EAS_TOKEN', signup: 'https://pai.console.aliyun.com',
+    free: 'Deployed EAS compute is usage-billed; set the service endpoint with `/v1` appended.',
+    models: ['default'],
+  },
+  {
+    id: 'huawei-modelarts', name: 'Huawei ModelArts Studio', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.modelarts-maas.com/v1', env: 'HUAWEI_MODELARTS_API_KEY',
+    signup: 'https://console.huaweicloud.com/modelarts/',
+    free: 'ModelArts MaaS usage is metered through Huawei Cloud.', models: ['DeepSeek-V31'],
   },
   {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
