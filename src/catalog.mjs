@@ -30,6 +30,12 @@ export const PROVIDERS = Object.freeze([
     free: 'Connects to a local vLLM OpenAI-compatible server.', models: [],
   },
   {
+    id: 'friendli-container', name: 'Friendli Container', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', env: null,
+    signup: 'https://friendli.ai/docs/guides/container/quickstart',
+    free: 'Connects to a self-hosted Friendli Container on its documented default port.', models: [],
+  },
+  {
     id: 'localai', name: 'LocalAI', badge: 'LOCAL', kind: 'local', keyless: true,
     baseUrl: 'http://127.0.0.1:8080/v1', env: null,
     signup: 'https://github.com/mudler/LocalAI',
@@ -503,6 +509,34 @@ export const PROVIDERS = Object.freeze([
     baseUrl: '', baseEnv: 'DATABRICKS_SERVING_BASE_URL', requiresBaseUrl: true,
     env: 'DATABRICKS_TOKEN', signup: 'https://docs.databricks.com/en/machine-learning/model-serving/score-foundation-models',
     free: 'Uses workspace billing; set the OpenAI-compatible workspace `/serving-endpoints` base URL.', models: [],
+  },
+  {
+    id: 'friendli', name: 'FriendliAI Serverless', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.friendli.ai/serverless/v1', env: 'FRIENDLI_API_KEY',
+    signup: 'https://suite.friendli.ai/personal-settings/tokens',
+    free: 'Serverless model usage is metered through Friendli Suite.',
+    models: ['meta-llama-3.3-70b-instruct', 'MiniMaxAI/MiniMax-M2.5'],
+  },
+  {
+    id: 'digitalocean', name: 'DigitalOcean Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: 'https://inference.do-ai.run/v1', env: 'DIGITALOCEAN_INFERENCE_KEY',
+    signup: 'https://cloud.digitalocean.com/gen-ai/model-access-keys',
+    free: 'Serverless inference is prepaid and billed per model token usage.',
+    models: ['openai-gpt-5.6-sol', 'openai-gpt-5.6-terra', 'openai-gpt-5.6-luna'],
+  },
+  {
+    id: 'digitalocean-agent', name: 'DigitalOcean Agent', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'DIGITALOCEAN_AGENT_BASE_URL', requiresBaseUrl: true,
+    env: 'DIGITALOCEAN_AGENT_ACCESS_KEY', signup: 'https://docs.digitalocean.com/products/ai-platform/how-to/use-agents/',
+    free: 'Uses the deployed agent and its attached model resources; set the endpoint’s `/api/v1` base URL.',
+    models: ['n/a'],
+  },
+  {
+    id: 'heroku', name: 'Heroku Managed Inference', badge: 'METERED', kind: 'cloud', keyless: false,
+    baseUrl: '', baseEnv: 'HEROKU_INFERENCE_BASE_URL', requiresBaseUrl: true,
+    env: 'HEROKU_INFERENCE_KEY', signup: 'https://elements.heroku.com/addons/heroku-inference',
+    free: 'Uses the attached Heroku add-on plan; set the provisioned `INFERENCE_URL` with `/v1` appended.',
+    models: ['claude-opus-4-5', 'claude-4-5-sonnet', 'claude-4-5-haiku', 'qwen3-coder-480b', 'gpt-oss-120b'],
   },
   {
     id: 'modelscope', name: 'ModelScope', badge: 'FREE TIER', kind: 'cloud', keyless: false,
