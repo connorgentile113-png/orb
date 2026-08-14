@@ -24,9 +24,11 @@ availability vary.
 orb                         choose a model and chat
 orb chat "hello"            one-shot chat
 orb use                     choose the default model
+orb use auto/free           use local-first automatic free fallback
 orb models --refresh        discover models from ready providers
 orb models --all            include providers that need keys
 orb providers               show access terms and readiness
+orb routes                  show the auto/free fallback order
 orb key set groq            securely prompt for a direct API key
 orb endpoint set cloudflare https://.../ai/v1
 orb doctor                  test provider model endpoints
@@ -40,7 +42,15 @@ slashes, so `github/openai/gpt-4.1-mini` selects the GitHub provider and the
 ```bash
 orb use ollama/qwen2.5:1.5b
 orb use openrouter/openrouter/free
+orb use auto/free
 ```
+
+`auto/free` tries the first installed Ollama model, then keyless OpenCode, Kilo,
+LLM7, Pollinations, and OVHcloud routes. Set `ORB_AUTO_ROUTES` to a comma-separated
+list of `provider/model` routes to customize that order, or set
+`ORB_DISABLE_LOCAL=1` to skip Ollama in automatic routing.
+For non-interactive first use, `orb chat "hello"` automatically selects
+`auto/free` when no local model or saved selection exists.
 
 Provider keys can be supplied with the environment variable shown by `orb key
 list`, or stored in `~/.orb/config.json`. The file and directory are created with

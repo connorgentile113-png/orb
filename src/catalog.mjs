@@ -1,5 +1,10 @@
 export const PROVIDERS = Object.freeze([
   {
+    id: 'auto', name: 'Orb Auto', badge: 'AUTO', kind: 'virtual', keyless: true,
+    baseUrl: '', env: null, signup: '', discover: false,
+    free: 'Falls back across ready local and keyless cloud routes.', models: ['free'],
+  },
+  {
     id: 'ollama', name: 'Ollama', badge: 'LOCAL', kind: 'local', keyless: true,
     baseUrl: 'http://127.0.0.1:11434/v1', modelsUrl: 'http://127.0.0.1:11434/api/tags',
     env: null, signup: 'https://ollama.com/download',
@@ -11,6 +16,36 @@ export const PROVIDERS = Object.freeze([
     baseUrl: 'http://127.0.0.1:8080/v1', env: null,
     signup: 'https://github.com/ggml-org/llama.cpp',
     free: 'Runs on your machine; no account, key, or usage charge.', models: [],
+  },
+  {
+    id: 'lmstudio', name: 'LM Studio', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:1234/v1', env: null,
+    signup: 'https://lmstudio.ai',
+    free: 'Discovers models served by LM Studio on its standard local port.', models: [],
+  },
+  {
+    id: 'vllm', name: 'vLLM', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v1', env: null,
+    signup: 'https://github.com/vllm-project/vllm',
+    free: 'Connects to a local vLLM OpenAI-compatible server.', models: [],
+  },
+  {
+    id: 'localai', name: 'LocalAI', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8080/v1', env: null,
+    signup: 'https://github.com/mudler/LocalAI',
+    free: 'Connects to a local LocalAI server; override the endpoint if its port differs.', models: [],
+  },
+  {
+    id: 'jan', name: 'Jan', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:1337/v1', env: null,
+    signup: 'https://jan.ai',
+    free: 'Discovers models exposed by Jan’s local OpenAI-compatible API.', models: [],
+  },
+  {
+    id: 'koboldcpp', name: 'KoboldCpp', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:5001/v1', env: null,
+    signup: 'https://github.com/LostRuins/koboldcpp',
+    free: 'Connects to KoboldCpp’s local OpenAI-compatible endpoint.', models: [],
   },
   {
     id: 'pollinations', name: 'Pollinations', badge: 'KEYLESS', kind: 'community', keyless: true,
@@ -91,10 +126,10 @@ export const PROVIDERS = Object.freeze([
     models: ['Qwen/Qwen2.5-7B-Instruct', 'deepseek-ai/DeepSeek-V3', 'THUDM/GLM-4-9B-0414'],
   },
   {
-    id: 'chutes', name: 'Chutes', badge: 'FREE TIER', kind: 'cloud', keyless: false,
+    id: 'chutes', name: 'Chutes', badge: 'METERED', kind: 'cloud', keyless: false,
     baseUrl: 'https://llm.chutes.ai/v1', env: 'CHUTES_API_KEY',
     signup: 'https://chutes.ai',
-    free: 'Community inference availability and limits vary by deployment.',
+    free: 'Current public inference is pay-per-token; retained as an optional direct provider.',
     models: ['deepseek-ai/DeepSeek-V3-0324', 'Qwen/Qwen3-32B', 'unsloth/gemma-3-27b-it'],
   },
   {
@@ -154,6 +189,13 @@ export const PROVIDERS = Object.freeze([
     models: ['MiniMax/MiniMax-M2.5', 'inclusionAI/Ling-2.6-1T', 'deepseek-ai/DeepSeek-V4-Flash', 'ZhipuAI/GLM-5', 'Qwen/Qwen3-Coder-480B-A35B-Instruct'],
   },
   {
+    id: 'ollama-cloud', name: 'Ollama Cloud', badge: 'FREE TIER', kind: 'cloud', keyless: false,
+    baseUrl: 'https://ollama.com/api', modelsUrl: 'https://ollama.com/api/tags', protocol: 'ollama', env: 'OLLAMA_API_KEY',
+    signup: 'https://ollama.com/settings/keys',
+    free: 'Account cloud models use session and weekly free-plan limits.',
+    models: ['gpt-oss:120b', 'gpt-oss:20b', 'qwen3-coder:480b', 'deepseek-v3.1:671b', 'minimax-m2.5'],
+  },
+  {
     id: 'llm7', name: 'LLM7', badge: 'KEYLESS', kind: 'community', keyless: true,
     baseUrl: 'https://api.llm7.io/v1', env: 'LLM7_API_KEY', optionalKey: true,
     signup: 'https://token.llm7.io', modelPolicy: 'included-tier',
@@ -163,7 +205,7 @@ export const PROVIDERS = Object.freeze([
   {
     id: 'ovh', name: 'OVHcloud AI Endpoints', badge: 'KEYLESS', kind: 'cloud', keyless: true,
     baseUrl: 'https://oai.endpoints.kepler.ai.cloud.ovh.net/v1', env: 'OVH_AI_ENDPOINTS_ACCESS_TOKEN', optionalKey: true,
-    signup: 'https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/',
+    signup: 'https://www.ovhcloud.com/en/public-cloud/ai-endpoints/catalog/', chatOnly: true,
     free: 'Anonymous inference is limited to roughly 2 RPM; a token provides account limits.',
     models: ['Qwen3.5-397B-A17B', 'Qwen3.6-27B', 'Meta-Llama-3_3-70B-Instruct', 'gpt-oss-120b', 'gpt-oss-20b', 'Qwen3-Coder-30B-A3B-Instruct'],
   },
@@ -229,6 +271,13 @@ export const PROVIDERS = Object.freeze([
     signup: 'https://console.x.ai',
     free: 'Account credits and eligibility vary; the direct API is not universally zero-cost.',
     models: ['grok-3-mini', 'grok-3', 'grok-4-fast-non-reasoning'],
+  },
+  {
+    id: 'vercel', name: 'Vercel AI Gateway', badge: 'FREE CREDITS', kind: 'cloud', keyless: false,
+    baseUrl: 'https://ai-gateway.vercel.sh/v1', env: 'VERCEL_AI_GATEWAY_API_KEY',
+    signup: 'https://vercel.com/dashboard/ai-gateway',
+    free: 'Team accounts receive $5/month until they purchase paid gateway credits.',
+    models: ['openai/gpt-oss-120b', 'moonshotai/kimi-k2', 'google/gemini-2.5-flash-lite', 'meta/llama-3.3-70b-instruct'],
   },
 ]);
 

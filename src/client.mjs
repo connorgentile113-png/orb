@@ -1,6 +1,14 @@
 import { PROVIDER_BY_ID, parseRoute, routeName } from './catalog.mjs';
 import { providerBaseUrl, providerKey } from './config.mjs';
 
+const DEFAULT_AUTO_ROUTES = Object.freeze([
+  'opencode/big-pickle',
+  'kilo/stepfun/step-3.7-flash:free',
+  'llm7/gpt-oss:20b',
+  'pollinations/openai-fast',
+  'ovh/gpt-oss-20b',
+]);
+
 function timeoutSignal(ms) {
   return AbortSignal.timeout(Number.isFinite(ms) ? ms : 90_000);
 }
@@ -36,8 +44,23 @@ export function resolveRoute(route, config) {
 }
 
 export function isConfigured(provider, config, env = process.env) {
+  if (provider.id === 'auto') return true;
   const hasEndpoint = !provider.requiresBaseUrl || Boolean(providerBaseUrl(provider, config, env));
   return hasEndpoint && (provider.keyless || Boolean(providerKey(provider, config, env)));
+}
+
+export async function autoRouteCandidates(config, env = process.env) {
+  const overridden = String(env.ORB_AUTO_ROUTES || '').split(',').map(value => value.trim()).filter(Boolean);
+  if (overridden.length) return overridden.filter(route => parseRoute(route).providerId !== 'auto');
+  const routes = [];
+  if (env.ORB_DISABLE_LOCAL !== '1') {
+    try {
+      const ollama = PROVIDER_BY_ID.get('ollama');
+      const local = await discoverModels(ollama, config, { env, timeout: 800 });
+      if (local[0]) routes.push(routeName('ollama', local[0]));
+    } catch { /* local inference is optional */ }
+  }
+  return [...new Set([...routes, ...DEFAULT_AUTO_ROUTES])];
 }
 
 export function modelIdsFromResponse(provider, body) {
@@ -52,6 +75,15 @@ export function modelIdsFromResponse(provider, body) {
   if (provider.modelPolicy === 'included-tier') {
     items = items.filter(item => typeof item === 'object' && item.usage_based_only === false);
   }
+  if (provider.chatOnly) {
+    items = items.filter(item => {
+      if (typeof item === 'string') return true;
+      const id = item.id || item.name || '';
+      const supportsCompletion = item.max_completion_tokens === undefined || item.max_completion_tokens > 0;
+      const chatType = item.model_type === undefined || item.model_type === 'chat';
+      return supportsCompletion && chatType && !/guard|embedding|whisper|stable-diffusion/i.test(id);
+    });
+  }
   return items.map(item => typeof item === 'string' ? item : item.id || item.name).filter(Boolean);
 }
 
@@ -61,10 +93,10 @@ export async function discoverModels(provider, config, { env = process.env, time
   if (!provider.keyless && !key) return [];
   if (!providerBaseUrl(provider, config, env)) return [];
   let url = `${providerBaseUrl(provider, config, env)}/models`;
-  if (provider.id === 'ollama') url = provider.modelsUrl;
+  if (provider.id === 'ollama' || provider.protocol === 'ollama') url = provider.modelsUrl;
   const response = await fetch(url, { headers: headersFor(provider, key), signal: timeoutSignal(timeout) });
   const body = await jsonOrError(response);
-  if (provider.id === 'ollama') return (body.models || []).map(item => item.model || item.name).filter(Boolean);
+  if (provider.id === 'ollama' || provider.protocol === 'ollama') return (body.models || []).map(item => item.model || item.name).filter(Boolean);
   return modelIdsFromResponse(provider, body);
 }
 
@@ -86,12 +118,79 @@ export async function availableModels(config, options = {}) {
   return discovered;
 }
 
+function openAiChatBody(value, model) {
+  return {
+    id: `orb-ollama-${Date.now()}`,
+    object: 'chat.completion', created: Math.floor(Date.now() / 1000), model,
+    choices: [{ index: 0, message: value.message || { role: 'assistant', content: '' }, finish_reason: value.done ? 'stop' : null }],
+    usage: {
+      prompt_tokens: value.prompt_eval_count || 0,
+      completion_tokens: value.eval_count || 0,
+      total_tokens: (value.prompt_eval_count || 0) + (value.eval_count || 0),
+    },
+  };
+}
+
+async function normalizeOllamaResponse(response, model, stream) {
+  if (!stream) {
+    const value = await jsonOrError(response);
+    return new Response(JSON.stringify(openAiChatBody(value, model)), {
+      status: 200, headers: { 'content-type': 'application/json; charset=utf-8' },
+    });
+  }
+  const encoder = new TextEncoder();
+  const decoder = new TextDecoder();
+  const body = new ReadableStream({
+    async start(controller) {
+      let buffer = '';
+      try {
+        for await (const chunk of response.body) {
+          buffer += decoder.decode(chunk, { stream: true });
+          const lines = buffer.split(/\r?\n/);
+          buffer = lines.pop() || '';
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            const value = JSON.parse(line);
+            const payload = {
+              id: `orb-ollama-${Date.now()}`, object: 'chat.completion.chunk',
+              created: Math.floor(Date.now() / 1000), model,
+              choices: [{ index: 0, delta: value.message || {}, finish_reason: value.done ? 'stop' : null }],
+            };
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(payload)}\n\n`));
+          }
+        }
+        controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+        controller.close();
+      } catch (error) { controller.error(error); }
+    },
+  });
+  return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
+}
+
 export async function createChatCompletion({ route, messages, stream = false, config, env = process.env, signal, temperature }) {
   const { provider, model } = resolveRoute(route, config);
+  if (provider.id === 'auto') {
+    const attempts = [];
+    for (const candidate of await autoRouteCandidates(config, env)) {
+      try {
+        const response = await createChatCompletion({ route: candidate, messages, stream, config, env, signal, temperature });
+        const headers = new Headers(response.headers);
+        headers.set('x-orb-route', candidate);
+        return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+      } catch (error) {
+        attempts.push(`${candidate}: ${error.message}`);
+      }
+    }
+    const error = new Error(`Every automatic free route failed. ${attempts.join(' | ')}`);
+    error.status = 502;
+    throw error;
+  }
   const key = providerKey(provider, config, env);
   if (!provider.keyless && !key) throw new Error(`${provider.name} needs ${provider.env}. Run \`orb key set ${provider.id}\`.`);
   if (!providerBaseUrl(provider, config, env)) throw new Error(`${provider.name} needs an account endpoint. Run \`orb endpoint set ${provider.id} <url>\`.`);
-  const url = `${providerBaseUrl(provider, config, env)}/chat/completions`;
+  const url = provider.protocol === 'ollama'
+    ? `${providerBaseUrl(provider, config, env)}/chat`
+    : `${providerBaseUrl(provider, config, env)}/chat/completions`;
   const body = { model, messages, stream };
   if (temperature !== undefined) body.temperature = temperature;
   const response = await fetch(url, {
@@ -99,6 +198,7 @@ export async function createChatCompletion({ route, messages, stream = false, co
     signal: signal || timeoutSignal(120_000),
   });
   if (!response.ok) await jsonOrError(response);
+  if (provider.protocol === 'ollama') return normalizeOllamaResponse(response, model, stream);
   return response;
 }
 

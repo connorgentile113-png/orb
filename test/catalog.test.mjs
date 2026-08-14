@@ -20,6 +20,13 @@ test('filters dynamic catalogs down to free routes', () => {
   assert.deepEqual(modelIdsFromResponse(includedProvider, { data: [
     { id: 'metered', usage_based_only: true }, { id: 'included', usage_based_only: false },
   ] }), ['included']);
+
+  const chatProvider = { chatOnly: true };
+  assert.deepEqual(modelIdsFromResponse(chatProvider, { data: [
+    { id: 'chat-model', max_completion_tokens: 4096 },
+    { id: 'embedding-model', max_completion_tokens: 0 },
+    { id: 'Safety-Guard', max_completion_tokens: 4096 },
+  ] }), ['chat-model']);
 });
 
 test('does not treat an unknown model namespace as a provider', () => {

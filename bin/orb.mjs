@@ -3,7 +3,7 @@ import { createInterface } from 'node:readline/promises';
 import process, { stdin, stdout, stderr } from 'node:process';
 import { PROVIDERS, PROVIDER_BY_ID, parseRoute, routeName } from '../src/catalog.mjs';
 import { loadConfig, saveConfig, configPath, providerBaseUrl, providerKey } from '../src/config.mjs';
-import { availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
+import { autoRouteCandidates, availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
 import { listen } from '../src/server.mjs';
 import { c, choose, logo, paint, secretPrompt, table, usage } from '../src/ui.mjs';
 
@@ -18,7 +18,7 @@ function option(args, name, fallback) {
 }
 
 async function localDefault(config) {
-  if (config.selected) return false;
+  if (config.selected || process.env.ORB_DISABLE_LOCAL === '1') return false;
   const ollama = PROVIDER_BY_ID.get('ollama');
   try {
     const models = await discoverModels(ollama, config, { timeout: 1_500 });
@@ -30,7 +30,10 @@ async function localDefault(config) {
 }
 
 async function readyCatalog(config, refresh = false) {
-  const ready = PROVIDERS.filter(provider => isConfigured(provider, config));
+  const ready = PROVIDERS.filter(provider => {
+    if (process.env.ORB_DISABLE_LOCAL === '1' && provider.kind === 'local') return false;
+    return isConfigured(provider, config);
+  });
   return availableModels(config, { providers: ready, refresh });
 }
 
@@ -69,12 +72,18 @@ async function modelsCommand(args, config) {
   const refresh = args.includes('--refresh');
   const showAll = args.includes('--all');
   const wanted = option(args, '--provider', '');
-  const providers = PROVIDERS.filter(provider => (!wanted || provider.id === wanted) && (showAll || isConfigured(provider, config)));
+  const providers = PROVIDERS.filter(provider => {
+    if (process.env.ORB_DISABLE_LOCAL === '1' && provider.kind === 'local' && !wanted) return false;
+    return (!wanted || provider.id === wanted) && (showAll || isConfigured(provider, config));
+  });
   if (wanted && !PROVIDER_BY_ID.has(wanted)) throw new Error(`Unknown provider: ${wanted}`);
   const catalog = await availableModels(config, { providers, refresh });
   const rows = providers.flatMap(provider => {
     const models = catalog.get(provider.id) || provider.models;
-    if (!models.length) return [[provider.id, '—', isConfigured(provider, config) ? 'ready' : `needs ${provider.env}`]];
+    if (!models.length) {
+      if (!showAll && !wanted) return [];
+      return [[provider.id, '—', isConfigured(provider, config) ? 'not running / no models' : `needs ${provider.env}`]];
+    }
     return models.map(model => [provider.id, model, routeName(provider.id, model) === config.selected ? 'selected' : (isConfigured(provider, config) ? 'ready' : 'key needed')]);
   });
   table(rows, [{ label: 'PROVIDER' }, { label: 'MODEL' }, { label: 'STATUS' }]);
@@ -88,6 +97,12 @@ function providersCommand(config) {
   ]);
   table(rows, [{ label: '' }, { label: 'ID' }, { label: 'PROVIDER' }, { label: 'ACCESS' }, { label: 'TERMS' }]);
   stdout.write(`\n${paint(c.dim, '● ready   ○ add the provider API key')}\n`);
+}
+
+async function routesCommand(config) {
+  const routes = await autoRouteCandidates(config, process.env);
+  table(routes.map((route, index) => [index + 1, route]), [{ label: 'PRIORITY' }, { label: 'AUTO/FREE ROUTE' }]);
+  stdout.write(`\n${paint(c.dim, 'Override with ORB_AUTO_ROUTES=provider/model,provider/model')}\n`);
 }
 
 function endpointCommand(args, config) {
@@ -155,7 +170,7 @@ async function doctorCommand(config) {
     const started = Date.now();
     try {
       const models = await discoverModels(provider, config, { timeout: 6_000 });
-      return [paint(c.green, '●'), provider.id, `${models.length} models · ${Date.now() - started}ms`, providerBaseUrl(provider, config, process.env)];
+      return [paint(c.green, '●'), provider.id, `${models.length} models · ${Date.now() - started}ms`, provider.id === 'auto' ? 'virtual' : providerBaseUrl(provider, config, process.env)];
     } catch (error) {
       return [paint(c.red, '●'), provider.id, error.message.slice(0, 55), providerBaseUrl(provider, config, process.env)];
     }
@@ -164,11 +179,11 @@ async function doctorCommand(config) {
 }
 
 async function chatCommand(args, config) {
-  await localDefault(config);
-  if (!config.selected) config.selected = await chooseModel(config);
-  if (!loadConfig().selected) saveConfig(config);
   const initial = args.filter(value => !value.startsWith('--')).join(' ').trim();
   const interactive = stdin.isTTY && !initial;
+  await localDefault(config);
+  if (!config.selected) config.selected = interactive ? await chooseModel(config) : 'auto/free';
+  if (!loadConfig().selected) saveConfig(config);
   const rl = interactive ? createInterface({ input: stdin, output: stdout }) : null;
   const messages = [];
   logo();
@@ -199,6 +214,10 @@ async function chatCommand(args, config) {
 
 async function serveCommand(args, config) {
   await localDefault(config);
+  if (!config.selected) {
+    config.selected = 'auto/free';
+    saveConfig(config);
+  }
   const host = option(args, '--host', '127.0.0.1');
   const port = Number.parseInt(option(args, '--port', '11435'), 10);
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Port must be between 1 and 65535.');
@@ -215,7 +234,7 @@ async function main() {
   const args = process.argv.slice(2);
   const command = args.shift() || '';
   if (['help', '--help', '-h'].includes(command)) return stdout.write(usage());
-  if (command === '--version' || command === '-v') return stdout.write('orb 0.2.0\n');
+  if (command === '--version' || command === '-v') return stdout.write('orb 0.3.0\n');
   const config = loadConfig();
   if (!command) {
     if (!stdin.isTTY) return stdout.write(usage());
@@ -227,6 +246,7 @@ async function main() {
   if (command === 'use') return useCommand(args, config);
   if (command === 'models') return modelsCommand(args, config);
   if (command === 'providers') return providersCommand(config);
+  if (command === 'routes') return routesCommand(config);
   if (command === 'key' || command === 'keys') return keyCommand(args, config);
   if (command === 'endpoint' || command === 'endpoints') return endpointCommand(args, config);
   if (command === 'doctor') return doctorCommand(config);

@@ -43,7 +43,7 @@ export function createOrbServer(config, { env = process.env } = {}) {
           temperature: body.temperature, config, env, signal: AbortSignal.timeout(120_000),
         });
         response.writeHead(upstream.status, Object.fromEntries(
-          [...upstream.headers.entries()].filter(([name]) => ['content-type', 'cache-control'].includes(name.toLowerCase())),
+          [...upstream.headers.entries()].filter(([name]) => ['content-type', 'cache-control', 'x-orb-route'].includes(name.toLowerCase())),
         ));
         for await (const chunk of upstream.body) response.write(chunk);
         return response.end();

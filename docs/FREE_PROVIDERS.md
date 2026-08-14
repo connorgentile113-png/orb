@@ -10,8 +10,6 @@ bypassing a provider’s limits.
 - [xyzs996/free-llm-api](https://github.com/xyzs996/free-llm-api) — recent,
   source-linked catalog that separates permanent tiers, trials, and retired
   offers. This was the main discovery source.
-- [cheahjs/free-llm-api-resources](https://github.com/cheahjs/free-llm-api-resources)
-  — long-running list that explicitly excludes reverse-engineered chatbot access.
 - [amardeeplakshkar/awesome-free-llm-apis](https://github.com/amardeeplakshkar/awesome-free-llm-apis)
   — compatibility and model cross-check.
 - [pollinations/pollinations](https://github.com/pollinations/pollinations) —
@@ -24,8 +22,14 @@ bypassing a provider’s limits.
 
 | Provider | orb ID | Access included | OpenAI base URL |
 |---|---|---|---|
+| Orb Auto | `auto` | local-first keyless fallback | virtual route |
 | Ollama | `ollama` | local, keyless | `http://127.0.0.1:11434/v1` |
 | llama.cpp | `llamacpp` | local, keyless | `http://127.0.0.1:8080/v1` |
+| LM Studio | `lmstudio` | local, keyless | `http://127.0.0.1:1234/v1` |
+| vLLM | `vllm` | local, keyless | `http://127.0.0.1:8000/v1` |
+| LocalAI | `localai` | local, keyless | `http://127.0.0.1:8080/v1` |
+| Jan | `jan` | local, keyless | `http://127.0.0.1:1337/v1` |
+| KoboldCpp | `koboldcpp` | local, keyless | `http://127.0.0.1:5001/v1` |
 | Pollinations legacy community endpoint | `pollinations` | keyless, rate-limited | `https://text.pollinations.ai/openai` |
 | Google Gemini | `gemini` | free tier | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | GroqCloud | `groq` | free tier | `https://api.groq.com/openai/v1` |
@@ -42,8 +46,9 @@ bypassing a provider’s limits.
 | Moonshot AI | `moonshot` | model-dependent free quota | `https://api.moonshot.ai/v1` |
 | OpenRouter | `openrouter` | models ending in `:free` | `https://openrouter.ai/api/v1` |
 | NVIDIA NIM | `nvidia` | evaluation allowance | `https://integrate.api.nvidia.com/v1` |
-| Chutes | `chutes` | community tier | `https://llm.chutes.ai/v1` |
+| Chutes | `chutes` | metered optional provider | `https://llm.chutes.ai/v1` |
 | ModelScope | `modelscope` | daily free request allowance | `https://api-inference.modelscope.cn/v1` |
+| Ollama Cloud | `ollama-cloud` | free-plan session/weekly limits | native `https://ollama.com/api` |
 | LLM7 | `llm7` | keyless quota; optional free token | `https://api.llm7.io/v1` |
 | OVHcloud AI Endpoints | `ovh` | anonymous rate-limited access | `https://oai.endpoints.kepler.ai.cloud.ovh.net/v1` |
 | Kilo Gateway | `kilo` | keyless `:free` routes | `https://api.kilo.ai/api/gateway` |
@@ -55,6 +60,7 @@ bypassing a provider’s limits.
 | Nscale | `nscale` | fair-use inference | `https://inference.api.nscale.com/v1` |
 | Nebius AI Studio | `nebius` | account credits | `https://api.studio.nebius.com/v1` |
 | xAI | `xai` | eligibility-dependent credits | `https://api.x.ai/v1` |
+| Vercel AI Gateway | `vercel` | $5 monthly gateway credits | `https://ai-gateway.vercel.sh/v1` |
 
 GitHub Models remains in the catalog for compatibility but is marked `FREE
 RETIRED`: the reviewed catalog records retirement of its free tier on
@@ -75,6 +81,9 @@ access requires payment verification.
 - [Kilo anonymous gateway access](https://github.com/Kilo-Org/kilocode/blob/main/packages/kilo-docs/pages/gateway/authentication.md)
 - [OpenCode free chat models](https://console.opencode.ai/guides)
 - [Ollama cloud and API-key behavior](https://docs.ollama.com/cloud)
+- [Vercel AI Gateway free-tier credits](https://vercel.com/docs/ai-gateway/pricing)
+- [Vercel OpenAI-compatible REST API](https://vercel.com/docs/ai-gateway/openai-compat/rest-api)
+- [Chutes current pay-per-token pricing](https://chutes.ai/pricing)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves
