@@ -42,6 +42,11 @@ bypassing a provider’s limits.
 | Aphrodite Engine | `aphrodite` | local, keyless | `http://127.0.0.1:2242/v1` |
 | MLX LM | `mlx-lm` | local, keyless | `http://127.0.0.1:8080/v1` |
 | TabbyAPI | `tabbyapi` | local, optional key | `http://127.0.0.1:5000/v1` |
+| Text Generation Inference | `tgi` | local, keyless | `http://127.0.0.1:8080/v1` |
+| Xinference | `xinference` | local, keyless | `http://127.0.0.1:9997/v1` |
+| MLC LLM | `mlc-llm` | local, keyless | `http://127.0.0.1:8000/v1` |
+| llama-cpp-python | `llama-cpp-python` | local, optional key | `http://127.0.0.1:8000/v1` |
+| Transformers Serve | `transformers-serve` | local, keyless | `http://127.0.0.1:8000/v1` |
 | Pollinations legacy community endpoint | `pollinations` | keyless, rate-limited | `https://text.pollinations.ai/openai` |
 | Google Gemini | `gemini` | free tier | `https://generativelanguage.googleapis.com/v1beta/openai` |
 | GroqCloud | `groq` | free tier | `https://api.groq.com/openai/v1` |
@@ -98,6 +103,9 @@ bypassing a provider’s limits.
 | MNN AI | `mnn` | one monthly free credit | `https://api.mnnai.ru/v1` |
 | Speka | `speka` | $1 model usage/month | `https://speka.me/v1` |
 | Intern AI | `intern-ai` | research-oriented free allowance | `https://chat.intern-ai.org.cn/api/v1` |
+| Auriko | `auriko` | three selected zero-priced GLM routes | `https://api.auriko.ai/v1` |
+| HelixMind API | `helixmind` | 3 RPM / 50 RPD verified subset | `https://helixmind.online/v1` |
+| TokenReply | `tokenreply` | weekly free-model quota | `https://api.tokenreply.com/v1` |
 | LongCat | `longcat` | one-time evaluation grant | `https://api.longcat.chat/openai/v1` |
 | Reka | `reka` | metered; free account only | `https://api.reka.ai/v1` |
 
@@ -157,6 +165,7 @@ access requires payment verification.
 - [MNN API, tiers, and limits](https://mnnai.ru/docs)
 - [Speka free plan](https://speka.me/pricing)
 - [Intern AI authentication](https://internlm.intern-ai.org.cn/docEn/docs/Authentication/)
+- [Auriko platform pricing](https://www.auriko.ai/platform/pricing)
 - [LongCat API overview](https://longcat.chat/platform/docs/APIDocs.html)
 - [Reka API quickstart](https://docs.reka.ai/quickstart) and
   [current metered pricing](https://docs.reka.ai/pricing)
@@ -166,6 +175,11 @@ access requires payment verification.
 - [Aphrodite OpenAI server](https://aphrodite.pygmalion.chat/usage/1-getting-started/)
 - [MLX LM HTTP server](https://github.com/ml-explore/mlx-lm/blob/main/mlx_lm/SERVER.md)
 - [TabbyAPI usage and authentication](https://github.com/theroyallab/tabbyAPI/wiki/03.-Usage)
+- [Text Generation Inference Messages API](https://huggingface.co/docs/text-generation-inference/main/en/basic_tutorials/consuming_tgi)
+- [Xinference OpenAI-compatible endpoints](https://xinference.co/xinference/developers.html)
+- [MLC LLM REST API](https://llm.mlc.ai/docs/deploy/rest.html)
+- [llama-cpp-python server](https://llama-cpp-python.readthedocs.io/en/stable/server/)
+- [Transformers Serve](https://huggingface.co/docs/transformers/serve-cli/serving)
 
 Free tiers change. `orb doctor` probes only providers for which the user has
 configured a key; it does not claim that a successful model-list request proves
