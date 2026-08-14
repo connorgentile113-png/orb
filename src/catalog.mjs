@@ -1350,6 +1350,41 @@ export const PROVIDERS = Object.freeze([
     free: 'Runs on user-controlled GPU infrastructure; registry and Red Hat subscription terms apply.',
     models: ['RedHatAI/Llama-3.2-1B-Instruct-FP8'],
   },
+  {
+    id: 'nexa', name: 'Nexa SDK', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:18181/v1', baseEnv: 'NEXA_URL',
+    env: 'NEXA_API_KEY', optionalKey: true,
+    signup: 'https://nexa.ai',
+    free: 'Runs models locally through the Nexa SDK with no per-token service charge.',
+    models: ['NexaAI/Qwen3-0.6B-GGUF', 'NexaAI/qwen3vl-GGUF'],
+  },
+  {
+    id: 'openvino', name: 'OpenVINO Model Server', badge: 'LOCAL', kind: 'local', keyless: true,
+    baseUrl: 'http://127.0.0.1:8000/v3', baseEnv: 'OPENVINO_MODEL_SERVER_URL',
+    env: 'OPENVINO_MODEL_SERVER_API_KEY', optionalKey: true,
+    signup: 'https://github.com/openvinotoolkit/model_server',
+    free: 'Runs locally on Intel CPU, GPU, or NPU hardware with no per-token service fee.',
+    models: ['OpenVINO/Qwen3-8B-int4-cw-ov'],
+  },
+  {
+    id: 'gaia', name: 'Gaia Node', badge: 'DECENTRALIZED', kind: 'community', keyless: false,
+    baseUrl: '', baseEnv: 'GAIA_NODE_URL', requiresBaseUrl: true, env: 'GAIA_API_KEY',
+    signup: 'https://www.gaianet.ai',
+    free: 'Each Gaia node controls its own access policy; provide the node-specific /v1 URL and key.',
+    models: ['model_name'],
+  },
+  {
+    id: 'wandb', name: 'Weights & Biases Inference', badge: 'CREDITS', kind: 'cloud', keyless: false,
+    baseUrl: 'https://api.inference.wandb.ai/v1', env: 'WANDB_API_KEY',
+    signup: 'https://wandb.ai/settings',
+    free: 'Requires W&B Inference credits; team and project attribution are optional for personal accounts.',
+    models: [
+      'moonshotai/Kimi-K2.5', 'openai/gpt-oss-120b', 'openai/gpt-oss-20b',
+      'deepseek-ai/DeepSeek-V3-0324', 'deepseek-ai/DeepSeek-R1-0528',
+      'meta-llama/Llama-3.3-70B-Instruct', 'meta-llama/Llama-4-Scout-17B-16E-Instruct',
+      'microsoft/Phi-4-mini-instruct',
+    ],
+  },
 ]);
 
 export const PROVIDER_BY_ID = new Map(PROVIDERS.map(provider => [provider.id, provider]));
