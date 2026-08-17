@@ -374,7 +374,7 @@ export const PROVIDERS = Object.freeze([
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', env: 'GEMINI_API_KEY',
     signup: 'https://aistudio.google.com/app/apikey',
     free: 'Google AI Studio offers a rate-limited free tier in supported regions.',
-    models: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemma-3-27b-it'],
+    models: ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'],
   },
   {
     id: 'mistral', name: 'Mistral La Plateforme', badge: 'FREE TIER', kind: 'cloud', keyless: false,

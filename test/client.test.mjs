@@ -217,6 +217,25 @@ test('normalizes OpenAI-compatible reasoning content into thinking blocks', asyn
   assert.equal(streamed, '<thinking>check carefully</thinking>Done.');
 });
 
+test('surfaces the real message from array-shaped provider errors', async t => {
+  const upstream = http.createServer(async (request, response) => {
+    response.writeHead(404, { 'content-type': 'application/json' });
+    response.end(JSON.stringify([{
+      error: { code: 404, message: 'This model is no longer available. Use models/gemini-3.6-flash', status: 'NOT_FOUND' },
+    }]));
+  });
+  await new Promise(resolve => upstream.listen(0, '127.0.0.1', resolve));
+  t.after(() => upstream.close());
+  const config = {
+    ...emptyConfig(), keys: { gemini: 'test-key' },
+    providers: { gemini: { baseUrl: `http://127.0.0.1:${upstream.address().port}/v1` } },
+  };
+  await assert.rejects(
+    completionText({ route: 'gemini/gemini-2.5-flash', messages: [], config }),
+    /This model is no longer available\. Use models\/gemini-3\.6-flash/,
+  );
+});
+
 test('auto/free falls back after an upstream failure', async t => {
   const upstream = http.createServer(async (request, response) => {
     const chunks = [];

@@ -60,6 +60,20 @@ test('filters dynamic catalogs down to free routes', () => {
   ] }), ['chat-model', 'endpoint-chat', 'slash-endpoint-chat', 'typed-chat', 'short-endpoint-chat']);
 });
 
+test('strips Google-style models/ prefix from discovered ids', () => {
+  assert.deepEqual(modelIdsFromResponse({}, { data: [
+    { id: 'models/gemini-3.6-flash' },
+    { id: 'models/gemini-3.5-flash' },
+    { id: 'normal-model' },
+  ] }), ['gemini-3.6-flash', 'gemini-3.5-flash', 'normal-model']);
+});
+
+test('gemini provider seeds current models, not retired ones', () => {
+  const gemini = PROVIDERS.find(provider => provider.id === 'gemini');
+  assert.equal(gemini.models.includes('gemini-3.6-flash'), true);
+  assert.equal(gemini.models.includes('gemini-2.5-flash'), false);
+});
+
 test('does not treat an unknown model namespace as a provider', () => {
   assert.deepEqual(parseRoute('vendor/model'), { providerId: null, model: 'vendor/model' });
 });

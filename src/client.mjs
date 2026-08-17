@@ -31,7 +31,10 @@ async function jsonOrError(response) {
   let body;
   try { body = text ? JSON.parse(text) : {}; } catch { body = { error: { message: text.slice(0, 500) } }; }
   if (!response.ok) {
-    const message = body?.error?.message || body?.message || `${response.status} ${response.statusText}`;
+    // Some providers (e.g. Google Gemini) return an array of error objects;
+    // surface the first message so the real reason reaches the client.
+    const first = Array.isArray(body) ? body[0] : body;
+    const message = first?.error?.message || first?.message || body?.error?.message || body?.message || `${response.status} ${response.statusText}`;
     const error = new Error(message);
     error.status = response.status;
     error.body = body;
@@ -133,7 +136,8 @@ export function modelIdsFromResponse(provider, body) {
         && !/guard|embed|rerank|whisper|stable-diffusion|image-|audio|voice|suno|kling|veo|banana/i.test(id);
     });
   }
-  return items.map(item => typeof item === 'string' ? item : item.id || item.name).filter(Boolean);
+  const unversioned = value => String(value || '').replace(/^models\//, '');
+  return items.map(item => typeof item === 'string' ? unversioned(item) : unversioned(item.id || item.name)).filter(Boolean);
 }
 
 export async function discoverModels(provider, config, { env = process.env, timeout = 5_000 } = {}) {
