@@ -7,7 +7,8 @@ import { autoRouteCandidates, availableModels, discoverModels, isConfigured, str
 import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
 import { launchCommand } from '../src/launch.mjs';
-import { c, chatHelp, choose, chooseRankedModel, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
+import { chooseCodingModel, chooseModel, readyCatalog } from '../src/picker.mjs';
+import { c, chatHelp, choose, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
 
 function fail(message, code = 1) {
   stderr.write(`${paint(c.red, 'error')}  ${message}\n`);
@@ -29,35 +30,6 @@ async function localDefault(config) {
     saveConfig(config);
     return true;
   } catch { return false; }
-}
-
-async function readyCatalog(config, refresh = false) {
-  const ready = PROVIDERS.filter(provider => {
-    if (process.env.ORB_DISABLE_LOCAL === '1' && provider.kind === 'local') return false;
-    return isConfigured(provider, config);
-  });
-  return availableModels(config, { providers: ready, refresh });
-}
-
-async function chooseModel(config) {
-  stdout.write(`${paint(c.dim, 'Discovering connected models…')}\r`);
-  const catalog = await readyCatalog(config, true);
-  if (stdout.isTTY) stdout.write('\x1b[2K\r');
-  const ready = PROVIDERS.map(provider => ({ provider, models: catalog.get(provider.id) || [] }))
-    .filter(entry => entry.models.length);
-  if (!ready.length) throw new Error('No ready models found. Start Ollama or add a cloud key with `orb key set <provider>`.');
-  const providerId = ready.length === 1 ? ready[0].provider.id : await choose('Choose a provider', ready.map(({ provider, models }) => ({
-    value: provider.id,
-    label: provider.name,
-    hint: `${provider.badge} · ${models.length} model${models.length === 1 ? '' : 's'}`,
-  })));
-  const entry = ready.find(item => item.provider.id === providerId);
-  const model = entry.models.length === 1 ? entry.models[0] : await choose(`${entry.provider.name} models`, entry.models.map(value => ({
-    value,
-    label: value,
-    hint: routeName(providerId, value) === config.selected ? 'selected' : '',
-  })));
-  return routeName(providerId, model);
 }
 
 async function useCommand(args, config) {
@@ -105,10 +77,10 @@ async function codeCommand(args, config) {
   table(shortlist.map((entry, index) => [
     index + 1, entry.route, entry.score, entry.reasons.join(' · '),
   ]), [{ label: '#' }, { label: 'CODING MODEL' }, { label: 'FIT' }, { label: 'WHY' }]);
-  const winner = options.listOnly ? shortlist[0] : await chooseRankedModel(shortlist);
-  config.selected = winner.route;
+  const route = options.listOnly ? shortlist[0].route : await chooseCodingModel(shortlist, config);
+  config.selected = route;
   saveConfig(config);
-  stdout.write(`\n${paint(c.green, '✓')} using ${paint(c.bold, winner.route)}\n`);
+  stdout.write(`\n${paint(c.green, '✓')} using ${paint(c.bold, route)}\n`);
   if (options.listOnly) return;
   return chatCommand(options.message, config);
 }

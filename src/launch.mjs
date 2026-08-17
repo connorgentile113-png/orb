@@ -4,11 +4,10 @@ import path from 'node:path';
 import process, { stdin, stdout } from 'node:process';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { PROVIDERS } from './catalog.mjs';
 import { saveConfig } from './config.mjs';
-import { availableModels, isConfigured } from './client.mjs';
 import { rankCodingModels } from './rank.mjs';
-import { c, choose, chooseRankedModel, divider, logo, paint, table } from './ui.mjs';
+import { chooseCodingModel, readyCatalog } from './picker.mjs';
+import { c, choose, divider, logo, paint, table } from './ui.mjs';
 
 const DEFAULT_PORT = 11435;
 
@@ -33,19 +32,11 @@ function tomlString(value) {
   return String(value).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
-async function readyCatalog(config) {
-  const ready = PROVIDERS.filter(provider => {
-    if (process.env.ORB_DISABLE_LOCAL === '1' && provider.kind === 'local') return false;
-    return isConfigured(provider, config);
-  });
-  return availableModels(config, { providers: ready, refresh: true });
-}
-
 async function rankShortlist(config, preference) {
-  const catalog = await readyCatalog(config);
+  const catalog = await readyCatalog(config, true);
   const ranked = rankCodingModels(catalog, preference);
   if (!ranked.length) throw new Error('No connected chat models found. Start a local server or add a provider key with `orb key set <provider>`.');
-  return ranked.slice(0, 10);
+  return { ranked, shortlist: ranked.slice(0, 10) };
 }
 
 async function serverHealthy(port) {
@@ -185,22 +176,22 @@ export async function launchCommand(args, config) {
   stdout.write(`${paint(c.dim, `Coding model scout for Codex · ${preference === 'accuracy' ? 'maximum accuracy' : 'cost efficiency'}`)}\n`);
   divider();
   stdout.write(`${paint(c.dim, 'Scanning connected providers…')}\n`);
-  const shortlist = await rankShortlist(config, preference);
+  const { ranked, shortlist } = await rankShortlist(config, preference);
   table(shortlist.map((entry, index) => [
     index + 1, entry.route, entry.score, entry.reasons.join(' · '),
   ]), [{ label: '#' }, { label: 'CODING MODEL' }, { label: 'FIT' }, { label: 'WHY' }]);
-  const winner = await chooseRankedModel(shortlist);
-  config.selected = winner.route;
+  const route = await chooseCodingModel(shortlist, config);
+  config.selected = route;
   saveConfig(config);
   const baseUrl = `http://127.0.0.1:${options.port}`;
   stdout.write(`\n${paint(c.dim, 'Starting the local Orb API…')}\n`);
   const server = await startServer(options.port);
   if (server) stdout.write(`${paint(c.green, '●')} Orb API listening at ${paint(c.bold, baseUrl)}\n`);
   else stdout.write(`${paint(c.green, '●')} Reusing Orb API already listening at ${paint(c.bold, baseUrl)}\n`);
-  const catalogPath = writeModelCatalog(shortlist);
-  const profile = writeCodexProfile({ baseUrl, route: winner.route, catalogPath });
+  const catalogPath = writeModelCatalog(ranked);
+  const profile = writeCodexProfile({ baseUrl, route, catalogPath });
   stdout.write(`${paint(c.green, '✓')} Codex profile ${paint(c.bold, profile)}\n`);
-  stdout.write(`${paint(c.green, '✓')} Launching Codex with ${paint(c.bold, winner.route)}\n\n`);
+  stdout.write(`${paint(c.green, '✓')} Launching Codex with ${paint(c.bold, route)}\n\n`);
   try {
     const exitCode = await runCodex(options.codexArgs, {});
     process.exitCode = exitCode;

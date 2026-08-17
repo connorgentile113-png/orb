@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'node:stream';
-import { choose, chooseRankedModel, filterChoices, parseRichText, plain, renderRichText, table, truncate } from '../src/ui.mjs';
+import { BROWSE_MODELS, choose, chooseRankedModel, filterChoices, parseRichText, plain, renderRichText, table, truncate } from '../src/ui.mjs';
 
 function fakeTerminal() {
   const input = new PassThrough();
@@ -87,6 +87,14 @@ test('ranked model picker skips prompting for a single entry', async () => {
   const { input, output } = fakeTerminal();
   const selected = await chooseRankedModel([{ route: 'only/model' }], { input, output });
   assert.equal(selected.route, 'only/model');
+});
+
+test('ranked model picker can request browsing all connected models', async () => {
+  const { input, output } = fakeTerminal();
+  const entries = [{ route: 'a/one' }, { route: 'b/two' }];
+  const selected = chooseRankedModel(entries, { input, output, allowBrowse: true });
+  setImmediate(() => input.write('b\n'));
+  assert.equal(await selected, BROWSE_MODELS);
 });
 
 test('rich responses parse thinking and fenced code blocks', () => {

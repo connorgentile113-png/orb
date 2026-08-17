@@ -270,20 +270,25 @@ export async function choose(title, items, { input = stdin, output = stdout } = 
   return terminalChoice(title, items, input, output);
 }
 
-export async function chooseRankedModel(entries, { input = stdin, output = stdout } = {}) {
+export const BROWSE_MODELS = Symbol('orb.browse-models');
+
+export async function chooseRankedModel(entries, { input = stdin, output = stdout, allowBrowse = false } = {}) {
   const winner = entries[0];
   if (!winner) throw new Error('No ranked models to choose from.');
-  if (entries.length === 1 || !input.isTTY || !output.isTTY) return winner;
+  if (!input.isTTY || !output.isTTY) return winner;
+  if (entries.length === 1 && !allowBrowse) return winner;
   const rl = createInterface({ input, output, terminal: true });
   try {
     while (true) {
+      const browseHint = allowBrowse ? ', or "b" to browse all' : '';
       const answer = (await rl.question(
-        `${paint(c.cyan, '›')} Use #1 ${paint(c.bold, winner.route)}? [Enter] or type 1-${entries.length}: `
+        `${paint(c.cyan, '›')} Use #1 ${paint(c.bold, winner.route)}? [Enter], type 1-${entries.length}${browseHint}: `
       )).trim();
       if (!answer) return winner;
+      if (allowBrowse && /^(b|browse|all|more)$/i.test(answer)) return BROWSE_MODELS;
       const index = Number.parseInt(answer, 10) - 1;
       if (Number.isInteger(index) && entries[index]) return entries[index];
-      output.write(`${paint(c.yellow, `Choose 1-${entries.length}.`)}\n`);
+      output.write(`${paint(c.yellow, `Choose 1-${entries.length}${allowBrowse ? ', or "b"' : ''}.`)}\n`);
     }
   } finally {
     rl.close();
