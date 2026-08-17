@@ -137,10 +137,15 @@ that optional key in the same private config file.
 
 ## Launch into Codex
 
-`orb launch codex` ranks every connected coding model (the same scoring as `orb
-code`), prints the ten-model shortlist, and asks you to confirm the #1 pick or
-type a number to choose any model in the list. It then starts the local Orb
-API, writes a Codex profile, and opens the Codex CLI against the chosen model:
+<p align="center">
+  <img src="https://raw.githubusercontent.com/connorgentile113-png/orb/main/assets/codex-logo.png" alt="OpenAI Codex logo" width="140">
+</p>
+
+Orb now ships with Codex CLI support. `orb launch codex` ranks every connected
+coding model (the same scoring as `orb code`), prints the ten-model shortlist,
+and asks you to confirm the #1 pick or type a number to choose any model in the
+list. It then starts the local Orb API, writes a Codex profile, and opens the
+Codex CLI against the chosen model:
 
 ```bash
 orb launch codex                 # ask accuracy vs cost, then launch
