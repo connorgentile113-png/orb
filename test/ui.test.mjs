@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PassThrough } from 'node:stream';
-import { choose, filterChoices, parseRichText, plain, renderRichText, table, truncate } from '../src/ui.mjs';
+import { choose, chooseRankedModel, filterChoices, parseRichText, plain, renderRichText, table, truncate } from '../src/ui.mjs';
 
 function fakeTerminal() {
   const input = new PassThrough();
@@ -54,6 +54,39 @@ test('tables fit long content to the terminal width', () => {
     { label: 'PROVIDER' }, { label: 'MODEL' }, { label: 'STATUS' },
   ], output);
   assert.equal(rendered.trimEnd().split('\n').every(line => plain(line).length <= 40), true);
+});
+
+test('ranked model picker defaults to the #1 entry on Enter', async () => {
+  const { input, output } = fakeTerminal();
+  const entries = [{ route: 'a/one' }, { route: 'b/two' }, { route: 'c/three' }];
+  const selected = chooseRankedModel(entries, { input, output });
+  setImmediate(() => input.write('\n'));
+  assert.equal((await selected).route, 'a/one');
+});
+
+test('ranked model picker accepts a numbered choice', async () => {
+  const { input, output } = fakeTerminal();
+  const entries = [{ route: 'a/one' }, { route: 'b/two' }, { route: 'c/three' }];
+  const selected = chooseRankedModel(entries, { input, output });
+  setImmediate(() => input.write('3\n'));
+  assert.equal((await selected).route, 'c/three');
+});
+
+test('ranked model picker re-prompts on an invalid number', async () => {
+  const { input, output } = fakeTerminal();
+  const entries = [{ route: 'a/one' }, { route: 'b/two' }];
+  const selected = chooseRankedModel(entries, { input, output });
+  setImmediate(() => {
+    input.write('9\n');
+    setImmediate(() => input.write('2\n'));
+  });
+  assert.equal((await selected).route, 'b/two');
+});
+
+test('ranked model picker skips prompting for a single entry', async () => {
+  const { input, output } = fakeTerminal();
+  const selected = await chooseRankedModel([{ route: 'only/model' }], { input, output });
+  assert.equal(selected.route, 'only/model');
 });
 
 test('rich responses parse thinking and fenced code blocks', () => {

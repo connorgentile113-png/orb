@@ -270,6 +270,26 @@ export async function choose(title, items, { input = stdin, output = stdout } = 
   return terminalChoice(title, items, input, output);
 }
 
+export async function chooseRankedModel(entries, { input = stdin, output = stdout } = {}) {
+  const winner = entries[0];
+  if (!winner) throw new Error('No ranked models to choose from.');
+  if (entries.length === 1 || !input.isTTY || !output.isTTY) return winner;
+  const rl = createInterface({ input, output, terminal: true });
+  try {
+    while (true) {
+      const answer = (await rl.question(
+        `${paint(c.cyan, '›')} Use #1 ${paint(c.bold, winner.route)}? [Enter] or type 1-${entries.length}: `
+      )).trim();
+      if (!answer) return winner;
+      const index = Number.parseInt(answer, 10) - 1;
+      if (Number.isInteger(index) && entries[index]) return entries[index];
+      output.write(`${paint(c.yellow, `Choose 1-${entries.length}.`)}\n`);
+    }
+  } finally {
+    rl.close();
+  }
+}
+
 export async function secretPrompt(label, { input = stdin, output = stdout } = {}) {
   if (!input.isTTY || !output.isTTY) throw new Error('Key entry needs an interactive terminal. Use the provider environment variable instead.');
   const rl = createInterface({ input, output, terminal: true });

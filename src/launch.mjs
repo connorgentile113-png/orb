@@ -8,7 +8,7 @@ import { PROVIDERS } from './catalog.mjs';
 import { saveConfig } from './config.mjs';
 import { availableModels, isConfigured } from './client.mjs';
 import { rankCodingModels } from './rank.mjs';
-import { c, choose, divider, logo, paint, table } from './ui.mjs';
+import { c, choose, chooseRankedModel, divider, logo, paint, table } from './ui.mjs';
 
 const DEFAULT_PORT = 11435;
 
@@ -41,11 +41,11 @@ async function readyCatalog(config) {
   return availableModels(config, { providers: ready, refresh: true });
 }
 
-async function rankWinner(config, preference) {
+async function rankShortlist(config, preference) {
   const catalog = await readyCatalog(config);
   const ranked = rankCodingModels(catalog, preference);
   if (!ranked.length) throw new Error('No connected chat models found. Start a local server or add a provider key with `orb key set <provider>`.');
-  return { winner: ranked[0], shortlist: ranked.slice(0, 10) };
+  return ranked.slice(0, 10);
 }
 
 async function serverHealthy(port) {
@@ -185,10 +185,11 @@ export async function launchCommand(args, config) {
   stdout.write(`${paint(c.dim, `Coding model scout for Codex · ${preference === 'accuracy' ? 'maximum accuracy' : 'cost efficiency'}`)}\n`);
   divider();
   stdout.write(`${paint(c.dim, 'Scanning connected providers…')}\n`);
-  const { winner, shortlist } = await rankWinner(config, preference);
+  const shortlist = await rankShortlist(config, preference);
   table(shortlist.map((entry, index) => [
     index + 1, entry.route, entry.score, entry.reasons.join(' · '),
   ]), [{ label: '#' }, { label: 'CODING MODEL' }, { label: 'FIT' }, { label: 'WHY' }]);
+  const winner = await chooseRankedModel(shortlist);
   config.selected = winner.route;
   saveConfig(config);
   const baseUrl = `http://127.0.0.1:${options.port}`;

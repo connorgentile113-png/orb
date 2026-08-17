@@ -7,7 +7,7 @@ import { autoRouteCandidates, availableModels, discoverModels, isConfigured, str
 import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
 import { launchCommand } from '../src/launch.mjs';
-import { c, chatHelp, choose, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
+import { c, chatHelp, choose, chooseRankedModel, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
 
 function fail(message, code = 1) {
   stderr.write(`${paint(c.red, 'error')}  ${message}\n`);
@@ -105,10 +105,10 @@ async function codeCommand(args, config) {
   table(shortlist.map((entry, index) => [
     index + 1, entry.route, entry.score, entry.reasons.join(' · '),
   ]), [{ label: '#' }, { label: 'CODING MODEL' }, { label: 'FIT' }, { label: 'WHY' }]);
-  const winner = shortlist[0];
+  const winner = options.listOnly ? shortlist[0] : await chooseRankedModel(shortlist);
   config.selected = winner.route;
   saveConfig(config);
-  stdout.write(`\n${paint(c.green, '✓')} ${preference === 'accuracy' ? 'accuracy' : 'cost-efficient'} pick: ${paint(c.bold, winner.route)}\n`);
+  stdout.write(`\n${paint(c.green, '✓')} using ${paint(c.bold, winner.route)}\n`);
   if (options.listOnly) return;
   return chatCommand(options.message, config);
 }

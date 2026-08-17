@@ -92,8 +92,8 @@ orb launch codex            rank coding models and open Codex CLI
 ```
 
 `orb code` refreshes every connected provider, ranks its chat models for coding,
-prints a ten-model shortlist with scoring reasons, selects the winner, and names
-the exact route before entering chat. With no flag it asks whether to optimize
+prints a ten-model shortlist with scoring reasons, and asks you to confirm the
+#1 pick or type a number to choose any model in the list before entering chat. With no flag it asks whether to optimize
 for maximum accuracy or cost efficiency. Use `--list` to rank and select without
 starting a conversation, or include a prompt for a one-shot coding request:
 
@@ -138,8 +138,9 @@ that optional key in the same private config file.
 ## Launch into Codex
 
 `orb launch codex` ranks every connected coding model (the same scoring as `orb
-code`), prints the ten-model shortlist, picks the winner, starts the local Orb
-API, writes a Codex profile, and opens the Codex CLI against that model:
+code`), prints the ten-model shortlist, and asks you to confirm the #1 pick or
+type a number to choose any model in the list. It then starts the local Orb
+API, writes a Codex profile, and opens the Codex CLI against the chosen model:
 
 ```bash
 orb launch codex                 # ask accuracy vs cost, then launch
