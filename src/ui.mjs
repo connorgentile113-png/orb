@@ -309,6 +309,7 @@ ${paint(c.bold, 'Usage')}  orb <command> [options]
   ${paint(c.cyan, 'orb key remove')} <provider>   remove a saved API key
   ${paint(c.cyan, 'orb endpoint set')} <id> <url> configure an account endpoint
   ${paint(c.cyan, 'orb serve')} [--port 11435]    start a local OpenAI API
+  ${paint(c.cyan, 'orb launch codex')}            rank coding models and open Codex
   ${paint(c.cyan, 'orb doctor')}                  check provider readiness
 
 No OmniRoute login, OAuth callback, or local bearer token is required.

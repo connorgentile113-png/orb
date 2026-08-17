@@ -6,6 +6,7 @@ import { loadConfig, saveConfig, configPath, providerBaseUrl, providerKey } from
 import { autoRouteCandidates, availableModels, discoverModels, isConfigured, streamCompletion } from '../src/client.mjs';
 import { rankCodingModels } from '../src/rank.mjs';
 import { listen } from '../src/server.mjs';
+import { launchCommand } from '../src/launch.mjs';
 import { c, chatHelp, choose, divider, hyperlink, logo, paint, renderRichText, secretPrompt, sessionHeader, table, usage } from '../src/ui.mjs';
 
 function fail(message, code = 1) {
@@ -336,6 +337,7 @@ async function main() {
   if (command === 'code') return codeCommand(args, config);
   if (command === 'chat' || command === 'ask') return chatCommand(args, config);
   if (command === 'serve') return serveCommand(args, config);
+  if (command === 'launch') return launchCommand(args, config);
   throw new Error(`Unknown command: ${command}\n${usage()}`);
 }
 

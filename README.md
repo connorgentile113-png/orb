@@ -88,6 +88,7 @@ orb key set groq            securely prompt for a direct API key
 orb endpoint set cloudflare https://.../ai/v1
 orb doctor                  test provider model endpoints
 orb serve --port 11435      expose an auth-free localhost OpenAI API
+orb launch codex            rank coding models and open Codex CLI
 ```
 
 `orb code` refreshes every connected provider, ranks its chat models for coding,
@@ -134,6 +135,31 @@ Providers that permit anonymous free-model access can optionally accept a key to
 raise limits. `orb key set kilo`, `orb key set llm7`, and similar commands keep
 that optional key in the same private config file.
 
+## Launch into Codex
+
+`orb launch codex` ranks every connected coding model (the same scoring as `orb
+code`), prints the ten-model shortlist, picks the winner, starts the local Orb
+API, writes a Codex profile, and opens the Codex CLI against that model:
+
+```bash
+orb launch codex                 # ask accuracy vs cost, then launch
+orb launch codex --accuracy      # strongest coding model first
+orb launch codex --cost          # free and efficient routes first
+orb launch codex --port 11436    # run the Orb API on a different port
+```
+
+Codex 0.122+ removed the chat-completions wire API, so `orb serve` exposes a
+`/v1/responses` endpoint that translates the Responses API into Orb's provider
+calls. The Codex profile is written to `~/.codex/orb.config.toml` (or
+`$CODEX_HOME/orb.config.toml`) and is launched with `codex -p orb`. Anything
+after `--` is forwarded to Codex, for example `orb launch codex -- -C ~/my-project`.
+
+The local Orb API ignores client auth, so the profile disables OpenAI auth
+(`requires_openai_auth = false`) and Codex sends no key. Direct
+Anthropic-protocol providers stream text but do not surface tool calls through
+Codex; to use Claude in Codex, connect it through an OpenAI-compatible provider
+such as OpenRouter.
+
 ## Local OpenAI API
 
 Start Orb's OpenAI-compatible server:
@@ -152,6 +178,7 @@ with `orb serve --port 8080`.
 | `GET` | `/health` | Check server status and see the selected default model. |
 | `GET` | `/v1/models` | List every model currently available from connected providers. |
 | `POST` | `/v1/chat/completions` | Create a standard or streaming chat completion. |
+| `POST` | `/v1/responses` | Responses API used by the Codex CLI (chat and streaming, with tool calls). |
 
 ### Check status and the selected model
 

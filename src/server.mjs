@@ -1,6 +1,8 @@
 import http from 'node:http';
+import { randomUUID } from 'node:crypto';
 import { PROVIDER_BY_ID, routeName } from './catalog.mjs';
 import { availableModels, createChatCompletion, isConfigured } from './client.mjs';
+import { chatStreamToResponses, chatToResponseItems, responsesObject, toChatRequest } from './responses.mjs';
 
 const MAX_BODY = 2 * 1024 * 1024;
 
@@ -47,6 +49,33 @@ export function createOrbServer(config, { env = process.env } = {}) {
         ));
         for await (const chunk of upstream.body) response.write(chunk);
         return response.end();
+      }
+      if (request.method === 'POST' && url.pathname === '/v1/responses') {
+        const body = await readJson(request);
+        const chat = toChatRequest(body);
+        const route = chat.route || config.selected;
+        const upstream = await createChatCompletion({
+          route, messages: chat.messages, stream: chat.stream, tools: chat.tools,
+          toolChoice: chat.toolChoice, maxTokens: chat.maxTokens, temperature: chat.temperature,
+          config, env, signal: AbortSignal.timeout(120_000),
+        });
+        const id = `resp_${randomUUID()}`;
+        if (chat.stream) {
+          const stream = chatStreamToResponses(upstream.body, { id, model: route });
+          response.writeHead(200, {
+            'content-type': 'text/event-stream; charset=utf-8',
+            'cache-control': 'no-cache',
+            'x-orb-route': route,
+          });
+          for await (const chunk of stream) response.write(chunk);
+          return response.end();
+        }
+        const completion = await upstream.json();
+        return sendJson(response, 200, responsesObject({
+          id, model: route,
+          items: chatToResponseItems(completion.choices?.[0]?.message),
+          usage: completion.usage,
+        }));
       }
       return sendJson(response, 404, { error: { message: 'Route not found.', type: 'not_found' } });
     } catch (error) {

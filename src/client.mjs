@@ -277,13 +277,13 @@ async function normalizeAnthropicResponse(response, model, stream) {
   return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-cache' } });
 }
 
-export async function createChatCompletion({ route, messages, stream = false, config, env = process.env, signal, temperature }) {
+export async function createChatCompletion({ route, messages, stream = false, config, env = process.env, signal, temperature, tools, toolChoice, maxTokens }) {
   const { provider, model } = resolveRoute(route, config);
   if (provider.id === 'auto') {
     const attempts = [];
     for (const candidate of await autoRouteCandidates(config, env)) {
       try {
-        const response = await createChatCompletion({ route: candidate, messages, stream, config, env, signal, temperature });
+        const response = await createChatCompletion({ route: candidate, messages, stream, config, env, signal, temperature, tools, toolChoice, maxTokens });
         const headers = new Headers(response.headers);
         headers.set('x-orb-route', candidate);
         return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
@@ -302,9 +302,15 @@ export async function createChatCompletion({ route, messages, stream = false, co
     : provider.protocol === 'anthropic' ? `${providerBaseUrl(provider, config, env)}/messages`
       : `${providerBaseUrl(provider, config, env)}/chat/completions`;
   const system = messages.filter(message => message.role === 'system').map(message => message.content).join('\n\n');
+  const chatTools = Array.isArray(tools) && tools.length ? tools : undefined;
   const body = provider.protocol === 'anthropic'
-    ? { model, messages: messages.filter(message => message.role !== 'system'), stream, max_tokens: 8192, ...(system ? { system } : {}) }
-    : { model, messages, stream };
+    ? { model, messages: messages.filter(message => message.role !== 'system'), stream, max_tokens: maxTokens || 8192, ...(system ? { system } : {}) }
+    : {
+      model, messages, stream,
+      ...(chatTools ? { tools: chatTools } : {}),
+      ...(toolChoice ? { tool_choice: toolChoice } : {}),
+      ...(maxTokens ? { max_tokens: maxTokens } : {}),
+    };
   if (key && provider.authBodyField) body[provider.authBodyField] = key;
   if (temperature !== undefined) body.temperature = temperature;
   const response = await fetch(url, {
