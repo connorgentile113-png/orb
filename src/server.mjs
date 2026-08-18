@@ -2,7 +2,7 @@ import http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { PROVIDER_BY_ID, routeName } from './catalog.mjs';
 import { availableModels, createChatCompletion, isConfigured } from './client.mjs';
-import { chatStreamToResponses, chatToResponseItems, responsesObject, toChatRequest } from './responses.mjs';
+import { chatStreamToResponses, chatToResponseItems, createSignatureCache, responsesObject, toChatRequest } from './responses.mjs';
 
 const MAX_BODY = 2 * 1024 * 1024;
 
@@ -24,6 +24,10 @@ async function readJson(request) {
 }
 
 export function createOrbServer(config, { env = process.env } = {}) {
+  // Gemini thinking models require their per-function-call `thought_signature`
+  // to be echoed back on the next turn. It can't ride in the Responses API, so
+  // keep a process-scoped cache keyed by tool-call id across requests.
+  const signatures = createSignatureCache();
   return http.createServer(async (request, response) => {
     try {
       const url = new URL(request.url, 'http://orb.local');
@@ -52,7 +56,7 @@ export function createOrbServer(config, { env = process.env } = {}) {
       }
       if (request.method === 'POST' && url.pathname === '/v1/responses') {
         const body = await readJson(request);
-        const chat = toChatRequest(body);
+        const chat = toChatRequest(body, signatures);
         const route = chat.route || config.selected;
         const upstream = await createChatCompletion({
           route, messages: chat.messages, stream: chat.stream, tools: chat.tools,
@@ -61,7 +65,7 @@ export function createOrbServer(config, { env = process.env } = {}) {
         });
         const id = `resp_${randomUUID()}`;
         if (chat.stream) {
-          const stream = chatStreamToResponses(upstream.body, { id, model: route });
+          const stream = chatStreamToResponses(upstream.body, { id, model: route, signatures });
           response.writeHead(200, {
             'content-type': 'text/event-stream; charset=utf-8',
             'cache-control': 'no-cache',
@@ -73,7 +77,7 @@ export function createOrbServer(config, { env = process.env } = {}) {
         const completion = await upstream.json();
         return sendJson(response, 200, responsesObject({
           id, model: route,
-          items: chatToResponseItems(completion.choices?.[0]?.message),
+          items: chatToResponseItems(completion.choices?.[0]?.message, signatures),
           usage: completion.usage,
         }));
       }

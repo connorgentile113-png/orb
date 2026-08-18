@@ -30,7 +30,37 @@ function messageFromItem(item) {
   return { role, content: stringifyContent(item.content) };
 }
 
-export function inputToMessages(body) {
+// Gemini thinking models attach an opaque `thought_signature` to each function
+// call part and require it back on the next turn. The OpenAI Chat Completions
+// shape orb speaks has no field for it, so it arrives in `extra_content` and is
+// silently dropped when we translate to the Responses API. We stash it in a
+// cache keyed by the tool-call id and re-attach it when the follow-up turn
+// replays the assistant message's tool_calls.
+export function thoughtSignatureOf(toolCall) {
+  if (!toolCall || typeof toolCall !== 'object') return undefined;
+  return toolCall.extra_content?.google?.thought_signature
+    ?? toolCall.function?.thought_signature
+    ?? toolCall.thought_signature;
+}
+
+export function createSignatureCache(limit = 10_000) {
+  const store = new Map();
+  return {
+    set(key, signature) {
+      if (!key || !signature) return;
+      if (store.size >= limit) {
+        const oldest = store.keys().next().value;
+        if (oldest) store.delete(oldest);
+      }
+      store.set(key, signature);
+    },
+    get(key) {
+      return store.get(key);
+    },
+  };
+}
+
+export function inputToMessages(body, signatures) {
   const messages = [];
   const instructions = stringifyContent(body.instructions);
   if (instructions) messages.push({ role: 'system', content: instructions });
@@ -45,11 +75,14 @@ export function inputToMessages(body) {
     if (!item || typeof item !== 'object') continue;
     if (item.type === 'function_call') {
       const previous = messages[messages.length - 1];
+      const id = item.call_id || `call_${randomUUID()}`;
+      const signature = signatures?.get(item.call_id || id);
       const call = {
-        id: item.call_id || `call_${randomUUID()}`,
+        id,
         type: 'function',
         function: { name: item.name || '', arguments: stringifyContent(item.arguments) },
       };
+      if (signature) call.extra_content = { google: { thought_signature: signature } };
       if (previous?.role === 'assistant' && Array.isArray(previous.tool_calls)) {
         previous.tool_calls.push(call);
       } else {
@@ -94,10 +127,10 @@ export function toolChoiceToChat(choice) {
   return undefined;
 }
 
-export function toChatRequest(body) {
+export function toChatRequest(body, signatures) {
   return {
     route: typeof body.model === 'string' ? body.model : '',
-    messages: inputToMessages(body),
+    messages: inputToMessages(body, signatures),
     tools: toolsToChat(body.tools),
     toolChoice: toolChoiceToChat(body.tool_choice),
     stream: Boolean(body.stream),
@@ -114,7 +147,7 @@ function usageFrom(usage) {
   };
 }
 
-export function chatToResponseItems(message) {
+export function chatToResponseItems(message, signatures) {
   const items = [];
   const content = stringifyContent(message?.content);
   const toolCalls = message?.tool_calls || [];
@@ -128,6 +161,8 @@ export function chatToResponseItems(message) {
     });
   }
   for (const call of toolCalls) {
+    const signature = thoughtSignatureOf(call);
+    if (signature) signatures?.set(call.id, signature);
     items.push({
       id: `fc_${randomUUID()}`,
       type: 'function_call',
@@ -160,7 +195,7 @@ function sse(event, data) {
 // stream. Codex is strict about the event sequence, so this mirrors the
 // canonical ordering: created -> in_progress -> message item -> text deltas ->
 // function-call items -> completed.
-export function chatStreamToResponses(upstreamBody, { id, model }) {
+export function chatStreamToResponses(upstreamBody, { id, model, signatures }) {
   const responseId = id;
   const createdAt = Math.floor(Date.now() / 1000);
   return new ReadableStream({
@@ -245,6 +280,7 @@ export function chatStreamToResponses(upstreamBody, { id, model }) {
           callId: '',
           name: '',
           arguments: '',
+          signature: undefined,
           outputIndex: nextOutputIndex++,
           finished: false,
         };
@@ -259,6 +295,7 @@ export function chatStreamToResponses(upstreamBody, { id, model }) {
       const finishCall = call => {
         if (call.finished) return;
         call.finished = true;
+        if (call.signature && call.callId) signatures?.set(call.callId, call.signature);
         const item = {
           id: call.id,
           type: 'function_call',
@@ -325,6 +362,11 @@ export function chatStreamToResponses(upstreamBody, { id, model }) {
                 startCall(index);
                 const call = calls.get(index);
                 if (entry.id) call.callId = entry.id;
+                const signature = thoughtSignatureOf(entry);
+                if (signature) {
+                  call.signature = signature;
+                  if (call.callId) signatures?.set(call.callId, signature);
+                }
                 if (entry.function?.name) call.name = entry.function.name;
                 const args = entry.function?.arguments || '';
                 if (args) {
