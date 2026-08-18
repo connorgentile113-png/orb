@@ -99,10 +99,14 @@ function writeModelCatalog(entries) {
   return target;
 }
 
-function writeCodexProfile({ baseUrl, route, catalogPath }) {
-  const target = codexProfilePath();
-  fs.mkdirSync(path.dirname(target), { recursive: true });
-  const profile = [
+// Builds the Codex profile TOML for the Orb provider. This must stay a
+// keyless provider: `requires_openai_auth = false` (no OpenAI auth at all) and
+// deliberately NO `forced_login_method` and NO `env_key`. A `forced_login_method`
+// makes Codex log the user out of their ChatGPT/API-key session whenever the
+// active credentials don't match it, so this profile never sets one — the
+// user's existing Codex login is left untouched.
+export function codexProfileToml({ baseUrl, route, catalogPath }) {
+  return [
     `model = "${tomlString(route)}"`,
     'model_provider = "orb"',
     `model_catalog_json = "${tomlString(catalogPath)}"`,
@@ -114,7 +118,12 @@ function writeCodexProfile({ baseUrl, route, catalogPath }) {
     'requires_openai_auth = false',
     '',
   ].join('\n');
-  fs.writeFileSync(target, profile, { mode: 0o600 });
+}
+
+function writeCodexProfile({ baseUrl, route, catalogPath }) {
+  const target = codexProfilePath();
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  fs.writeFileSync(target, codexProfileToml({ baseUrl, route, catalogPath }), { mode: 0o600 });
   return target;
 }
 
